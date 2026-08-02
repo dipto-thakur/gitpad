@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { commitFileAction } from '@/actions/github';
 import { DeleteFileButton } from '@/components/DeleteFileButton';
+import { RenameFileButton } from '@/components/RenameFileButton';
 import type { FileContent } from '@/types';
 
 export function Editor({
@@ -82,6 +83,7 @@ export function Editor({
         <h1 className="text-sm font-medium">{file.path}</h1>
         <div className="flex items-center gap-3">
           <span className="text-xs text-muted">{branch}</span>
+          <RenameFileButton owner={owner} repo={repo} branch={branch} path={file.path} />
           <DeleteFileButton owner={owner} repo={repo} branch={branch} path={file.path} sha={sha} />
         </div>
       </div>

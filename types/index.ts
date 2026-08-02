@@ -37,6 +37,11 @@ export interface CommitResult {
   contentSha: string;
 }
 
+export interface RenameResult {
+  commitSha: string;
+  deleteCommitSha: string;
+}
+
 export type ActionResult<T> =
   | { ok: true; data: T }
   | { ok: false; error: string; code: ErrorCode };

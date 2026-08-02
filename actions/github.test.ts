@@ -8,6 +8,7 @@ const mockGetFile = vi.fn();
 const mockCommitFile = vi.fn();
 const mockListRepositories = vi.fn();
 const mockDeleteFile = vi.fn();
+const mockCreateFile = vi.fn();
 
 vi.mock('@/lib/github/client', async () => {
   const actual = await vi.importActual<typeof import('@/lib/github/client')>(
@@ -20,6 +21,7 @@ vi.mock('@/lib/github/client', async () => {
       commitFile: mockCommitFile,
       listRepositories: mockListRepositories,
       deleteFile: mockDeleteFile,
+      createFile: mockCreateFile,
     })),
   };
 });
@@ -27,9 +29,11 @@ vi.mock('@/lib/github/client', async () => {
 import { GitHubApiError } from '@/lib/github/client';
 import {
   commitFileAction,
+  createFileAction,
   deleteFileAction,
   getFileAction,
   listRepositoriesAction,
+  renameFileAction,
 } from './github';
 
 const VALID_SHA = 'a'.repeat(40);
@@ -40,6 +44,7 @@ describe('server action error mapping (mocked GitHubClient)', () => {
     mockCommitFile.mockReset();
     mockListRepositories.mockReset();
     mockDeleteFile.mockReset();
+    mockCreateFile.mockReset();
   });
 
   it('commitFileAction: 409 conflict -> SHA_MISMATCH with reload-and-retry message', async () => {
@@ -172,5 +177,150 @@ describe('server action error mapping (mocked GitHubClient)', () => {
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.code).toBe('VALIDATION');
     expect(mockDeleteFile).not.toHaveBeenCalled();
+  });
+
+  it('createFileAction: succeeds on a free path', async () => {
+    mockCreateFile.mockResolvedValueOnce({ commitSha: 'm'.repeat(40), contentSha: 'n'.repeat(40) });
+    const result = await createFileAction({
+      owner: 'dipto',
+      repo: 'notes',
+      branch: 'main',
+      path: 'new-doc.md',
+      content: '# New',
+      message: 'Create new-doc.md',
+    });
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.data.contentSha).toBe('n'.repeat(40));
+  });
+
+  it('createFileAction: existing path -> friendly "already exists" message, not stale-sha wording', async () => {
+    mockCreateFile.mockRejectedValueOnce(new GitHubApiError('exists', 422, 'SHA_MISMATCH'));
+    const result = await createFileAction({
+      owner: 'dipto',
+      repo: 'notes',
+      branch: 'main',
+      path: 'README.md',
+      content: 'dup',
+      message: 'Create README.md',
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.code).toBe('VALIDATION');
+      expect(result.error).toContain('already exists');
+    }
+  });
+
+  it('createFileAction: rejects unsupported file extensions before calling GitHubClient', async () => {
+    const result = await createFileAction({
+      owner: 'dipto',
+      repo: 'notes',
+      branch: 'main',
+      path: 'image.png',
+      content: '',
+      message: 'Create image.png',
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.code).toBe('UNSUPPORTED_FILE');
+    expect(mockCreateFile).not.toHaveBeenCalled();
+  });
+
+  it('renameFileAction: reads fresh content, creates new path, then deletes old path with the fresh sha', async () => {
+    mockGetFile.mockResolvedValueOnce({
+      path: 'old.md',
+      content: 'body',
+      sha: VALID_SHA,
+      encoding: 'utf-8',
+      size: 4,
+    });
+    mockCreateFile.mockResolvedValueOnce({ commitSha: 'c1'.padEnd(40, '0'), contentSha: 'd1'.padEnd(40, '0') });
+    mockDeleteFile.mockResolvedValueOnce({ commitSha: 'c2'.padEnd(40, '0') });
+
+    const result = await renameFileAction({
+      owner: 'dipto',
+      repo: 'notes',
+      branch: 'main',
+      oldPath: 'old.md',
+      newPath: 'new.md',
+      message: 'Rename old.md to new.md',
+    });
+
+    expect(result.ok).toBe(true);
+    expect(mockCreateFile).toHaveBeenCalledWith(
+      expect.objectContaining({ path: 'new.md', content: 'body' }),
+    );
+    // Delete must only be called with the freshly-read sha, and only after
+    // create has already resolved.
+    expect(mockDeleteFile).toHaveBeenCalledWith(
+      expect.objectContaining({ path: 'old.md', sha: VALID_SHA }),
+    );
+    if (result.ok) {
+      expect(result.data.commitSha).toBe('c1'.padEnd(40, '0'));
+      expect(result.data.deleteCommitSha).toBe('c2'.padEnd(40, '0'));
+    }
+  });
+
+  it('renameFileAction: new path already taken -> never deletes the old file', async () => {
+    mockGetFile.mockResolvedValueOnce({
+      path: 'old.md',
+      content: 'body',
+      sha: VALID_SHA,
+      encoding: 'utf-8',
+      size: 4,
+    });
+    mockCreateFile.mockRejectedValueOnce(new GitHubApiError('exists', 422, 'SHA_MISMATCH'));
+
+    const result = await renameFileAction({
+      owner: 'dipto',
+      repo: 'notes',
+      branch: 'main',
+      oldPath: 'old.md',
+      newPath: 'taken.md',
+      message: 'Rename old.md to taken.md',
+    });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain('already exists');
+    expect(mockDeleteFile).not.toHaveBeenCalled();
+  });
+
+  it('renameFileAction: create succeeds but delete fails -> reports partial state honestly, does not claim full success', async () => {
+    mockGetFile.mockResolvedValueOnce({
+      path: 'old.md',
+      content: 'body',
+      sha: VALID_SHA,
+      encoding: 'utf-8',
+      size: 4,
+    });
+    mockCreateFile.mockResolvedValueOnce({ commitSha: 'c1'.padEnd(40, '0'), contentSha: 'd1'.padEnd(40, '0') });
+    mockDeleteFile.mockRejectedValueOnce(new GitHubApiError('conflict', 409, 'SHA_MISMATCH'));
+
+    const result = await renameFileAction({
+      owner: 'dipto',
+      repo: 'notes',
+      branch: 'main',
+      oldPath: 'old.md',
+      newPath: 'new.md',
+      message: 'Rename old.md to new.md',
+    });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).toContain('new.md');
+      expect(result.error).toContain("couldn't remove old.md");
+    }
+  });
+
+  it('renameFileAction: rejects identical old/new paths before touching GitHubClient', async () => {
+    const result = await renameFileAction({
+      owner: 'dipto',
+      repo: 'notes',
+      branch: 'main',
+      oldPath: 'same.md',
+      newPath: 'same.md',
+      message: 'noop',
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.code).toBe('VALIDATION');
+    expect(mockGetFile).not.toHaveBeenCalled();
   });
 });

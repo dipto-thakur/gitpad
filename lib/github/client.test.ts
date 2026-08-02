@@ -163,6 +163,43 @@ describe('GitHubClient integration (canned success responses)', () => {
     expect(result).toEqual({ commitSha: 'e'.repeat(40) });
   });
 
+  it('createFile: returns commit and content sha on success (no sha sent in request body)', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      mockResponse(200, {
+        content: { sha: 'n'.repeat(40) },
+        commit: { sha: 'm'.repeat(40) },
+      }),
+    );
+    const result = await client.createFile({
+      owner: 'dipto',
+      repo: 'notes',
+      branch: 'main',
+      path: 'new-doc.md',
+      content: '# New doc',
+      message: 'Create new-doc.md',
+    });
+    expect(result).toEqual({ commitSha: 'm'.repeat(40), contentSha: 'n'.repeat(40) });
+    const [, init] = vi.mocked(fetch).mock.calls[0]!;
+    const body = JSON.parse((init as RequestInit).body as string);
+    expect(body.sha).toBeUndefined();
+  });
+
+  it('createFile: 422 (path already exists) surfaces as SHA_MISMATCH for the caller to interpret', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      mockResponse(422, { message: 'sha wasn\'t supplied' }),
+    );
+    await expect(
+      client.createFile({
+        owner: 'dipto',
+        repo: 'notes',
+        branch: 'main',
+        path: 'README.md',
+        content: 'dup',
+        message: 'Create README.md',
+      }),
+    ).rejects.toMatchObject({ code: 'SHA_MISMATCH', status: 422 });
+  });
+
   it('getFile: rejects unsupported file types before making a request', async () => {
     await expect(client.getFile('dipto', 'notes', 'main', 'photo.png')).rejects.toMatchObject({
       message: expect.stringContaining('Unsupported'),

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { listTreeAction } from '@/actions/github';
 import type { TreeEntry } from '@/types';
+import { CreateEntryForm } from '@/components/CreateEntryForm';
 
 export function FileBrowser({
   owner,
@@ -21,6 +22,7 @@ export function FileBrowser({
   const [entries, setEntries] = useState<TreeEntry[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [openDirs, setOpenDirs] = useState<Set<string>>(new Set());
+  const [reloadToken, setReloadToken] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -34,7 +36,7 @@ export function FileBrowser({
     return () => {
       cancelled = true;
     };
-  }, [owner, repo, branch, path]);
+  }, [owner, repo, branch, path, reloadToken]);
 
   function toggleDir(p: string) {
     setOpenDirs((prev) => {
@@ -45,20 +47,47 @@ export function FileBrowser({
     });
   }
 
+  const createForm = (
+    <CreateEntryForm
+      owner={owner}
+      repo={repo}
+      branch={branch}
+      basePath={path}
+      onCreated={() => setReloadToken((t) => t + 1)}
+    />
+  );
+
   if (error) {
-    return <p className="text-sm text-red-700">{error}</p>;
+    return (
+      <div style={{ paddingLeft: depth === 0 ? 0 : 16 }}>
+        {createForm}
+        <p className="text-sm text-red-700">{error}</p>
+      </div>
+    );
   }
 
   if (entries === null) {
-    return <p className="text-sm text-muted">Loading…</p>;
+    return (
+      <div style={{ paddingLeft: depth === 0 ? 0 : 16 }}>
+        {createForm}
+        <p className="text-sm text-muted">Loading…</p>
+      </div>
+    );
   }
 
   if (entries.length === 0) {
-    return <p className="text-sm text-muted">Empty directory.</p>;
+    return (
+      <div style={{ paddingLeft: depth === 0 ? 0 : 16 }}>
+        {createForm}
+        <p className="text-sm text-muted">Empty directory.</p>
+      </div>
+    );
   }
 
   return (
-    <ul style={{ paddingLeft: depth === 0 ? 0 : 16 }} className="space-y-0.5">
+    <div style={{ paddingLeft: depth === 0 ? 0 : 16 }}>
+      {createForm}
+      <ul className="space-y-0.5">
       {entries.map((entry) => (
         <li key={entry.path}>
           {entry.type === 'dir' ? (
@@ -96,6 +125,7 @@ export function FileBrowser({
           )}
         </li>
       ))}
-    </ul>
+      </ul>
+    </div>
   );
 }

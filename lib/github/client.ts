@@ -130,6 +130,40 @@ export class GitHubClient {
   }
 
   /**
+   * Creates a new file. Deliberately omits `sha` in the request body:
+   * GitHub's Contents API treats that as "create", and rejects the write
+   * with 422 if a file already exists at that path — which is exactly the
+   * safety property we want (never silently clobber an existing file via
+   * "create").
+   */
+  async createFile(params: {
+    owner: string;
+    repo: string;
+    branch: string;
+    path: string;
+    content: string;
+    message: string;
+  }): Promise<{ commitSha: string; contentSha: string }> {
+    const encodedPath = params.path.split('/').filter(Boolean).map(encodeURIComponent).join('/');
+    const res = await this.request<GhCommitResponse>(
+      `/repos/${params.owner}/${params.repo}/contents/${encodedPath}`,
+      {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: params.message,
+          content: encodeUtf8ToBase64(params.content),
+          branch: params.branch,
+        }),
+      },
+    );
+    return {
+      commitSha: res.commit.sha,
+      contentSha: res.content?.sha ?? '',
+    };
+  }
+
+  /**
    * Commits new content to a file. GitHub's Contents API is optimistic-
    * concurrency: the caller must supply the sha it last read. If the file
    * has changed remotely since, GitHub returns 409/422 and we surface that
