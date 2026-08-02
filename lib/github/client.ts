@@ -1,7 +1,12 @@
 import 'server-only';
-import { decodeBase64ToUtf8, encodeUtf8ToBase64, MAX_EDITABLE_FILE_BYTES } from '@/lib/encoding/base64';
+import {
+  decodeBase64ToUtf8Strict,
+  BinaryContentError,
+  encodeUtf8ToBase64,
+  MAX_EDITABLE_FILE_BYTES,
+} from '@/lib/encoding/base64';
 import type { BranchSummary, FileContent, RepoSummary, TreeEntry } from '@/types';
-import { isSupportedFile } from '@/lib/validation';
+import { isLikelyBinaryPath } from '@/lib/validation';
 
 const GITHUB_API = process.env.GITHUB_API_BASE_URL ?? 'https://api.github.com';
 
@@ -13,6 +18,19 @@ export class GitHubApiError extends Error {
     super(message);
     this.status = status;
     this.code = code;
+  }
+}
+
+/**
+ * Thrown by getFile() when the fetched bytes fail strict UTF-8 validation —
+ * i.e. the file is actually binary, regardless of what its extension
+ * suggested. Kept distinct from GitHubApiError since this isn't an HTTP
+ * failure; the request succeeded, the content just isn't editable text.
+ */
+export class BinaryFileError extends Error {
+  constructor(path: string) {
+    super(`"${path}" is a binary file and cannot be edited here.`);
+    this.name = 'BinaryFileError';
   }
 }
 
@@ -106,9 +124,6 @@ export class GitHubClient {
   }
 
   async getFile(owner: string, repo: string, branch: string, path: string): Promise<FileContent> {
-    if (!isSupportedFile(path)) {
-      throw new GitHubApiError('Unsupported file type', 400, 'UNKNOWN');
-    }
     const encodedPath = path.split('/').filter(Boolean).map(encodeURIComponent).join('/');
     const item = await this.request<GhContentItem>(
       `/repos/${owner}/${repo}/contents/${encodedPath}?ref=${encodeURIComponent(branch)}`,
@@ -119,7 +134,15 @@ export class GitHubClient {
     if ((item.size ?? 0) > MAX_EDITABLE_FILE_BYTES) {
       throw new GitHubApiError('File too large to edit safely', 413, 'UNKNOWN');
     }
-    const content = item.content ? decodeBase64ToUtf8(item.content) : '';
+    let content = '';
+    if (item.content) {
+      try {
+        content = decodeBase64ToUtf8Strict(item.content);
+      } catch (e) {
+        if (e instanceof BinaryContentError) throw new BinaryFileError(path);
+        throw e;
+      }
+    }
     return {
       path: item.path,
       content,
@@ -255,7 +278,7 @@ function toTreeEntry(item: GhContentItem): TreeEntry {
     type,
     sha: item.sha,
     size: item.size,
-    supported: type === 'dir' ? true : isSupportedFile(item.name),
+    supported: type === 'dir' ? true : !isLikelyBinaryPath(item.name),
   };
 }
 

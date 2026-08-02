@@ -118,10 +118,15 @@ export function FileBrowser({
               <span>{entry.name}</span>
             </Link>
           ) : (
-            <span className="flex items-center gap-1.5 rounded px-2 py-1 text-sm text-muted/60">
+            <Link
+              href={`/repos/${owner}/${repo}/edit/${entry.path}?branch=${encodeURIComponent(branch)}`}
+              title="Extension suggests a binary file — opening will confirm"
+              className="flex items-center gap-1.5 rounded px-2 py-1 text-sm text-muted/60 hover:bg-gray-50"
+            >
               <span>·</span>
               <span>{entry.name}</span>
-            </span>
+              <span className="text-xs">(likely binary)</span>
+            </Link>
           )}
         </li>
       ))}

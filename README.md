@@ -1,7 +1,18 @@
 # GitHub Doc Editor
 
-Edit Markdown/text/config files in your own GitHub repos and commit them —
-no Git, terminal, VS Code, or local clone.
+Edit any UTF-8 text file — Markdown, code, config, whatever — in your own
+GitHub repos and commit it directly. No Git, terminal, VS Code, or local
+clone.
+
+GitHub's Contents API doesn't distinguish `.md` from `.py` or `.html`; only
+binary vs. text matters, and that's a property of a file's bytes, not its
+extension. So neither do we: any file that decodes as valid UTF-8 is
+editable here, full stop. A small extension blocklist (images, video,
+audio, fonts, archives, executables, office docs) exists purely to grey out
+obviously-binary files in the browser — it's a UI hint, not a gate. The
+real check is a strict UTF-8 decode of the actual bytes at open time
+(`lib/encoding/base64.ts`), which also correctly accepts a text file with a
+misleading extension and rejects a binary file with an innocent-looking one.
 
 Not an IDE. Not GitHub Desktop. Login → repo → branch → file → edit → commit.
 

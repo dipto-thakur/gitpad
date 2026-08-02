@@ -10,8 +10,9 @@ export default async function HomePage() {
     <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-6 px-6 text-center">
       <h1 className="text-xl font-semibold tracking-tight">GitHub Doc Editor</h1>
       <p className="text-sm text-muted">
-        Edit Markdown, text, and config files in your repositories and commit
-        directly, without Git, terminal, or a local clone.
+        Edit any UTF-8 text file — Markdown, code, config, whatever — in your
+        repositories and commit directly, without Git, terminal, or a local
+        clone.
       </p>
       <SignInButton />
     </main>

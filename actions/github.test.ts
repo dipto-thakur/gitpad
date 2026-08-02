@@ -26,7 +26,7 @@ vi.mock('@/lib/github/client', async () => {
   };
 });
 
-import { GitHubApiError } from '@/lib/github/client';
+import { BinaryFileError, GitHubApiError } from '@/lib/github/client';
 import {
   commitFileAction,
   createFileAction,
@@ -93,6 +93,29 @@ describe('server action error mapping (mocked GitHubClient)', () => {
       expect(result.code).toBe('NOT_FOUND');
       expect(result.error).toContain('no longer exists in the repository');
     }
+  });
+
+  it('getFileAction: binary content -> UNSUPPORTED_FILE with a clear "cannot be edited" message', async () => {
+    mockGetFile.mockRejectedValueOnce(new BinaryFileError('logo.png'));
+    const result = await getFileAction('dipto', 'notes', 'main', 'logo.png');
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.code).toBe('UNSUPPORTED_FILE');
+      expect(result.error).toContain('cannot be edited here');
+    }
+  });
+
+  it('getFileAction: opens files of any extension — no whitelist gate before the fetch', async () => {
+    mockGetFile.mockResolvedValueOnce({
+      path: 'main.py',
+      content: 'print(1)',
+      sha: 'a'.repeat(40),
+      encoding: 'utf-8',
+      size: 8,
+    });
+    const result = await getFileAction('dipto', 'notes', 'main', 'main.py');
+    expect(result.ok).toBe(true);
+    expect(mockGetFile).toHaveBeenCalledWith('dipto', 'notes', 'main', 'main.py');
   });
 
   it('listRepositoriesAction: 429 -> RATE_LIMITED, friendly retry message', async () => {
@@ -210,17 +233,32 @@ describe('server action error mapping (mocked GitHubClient)', () => {
     }
   });
 
-  it('createFileAction: rejects unsupported file extensions before calling GitHubClient', async () => {
+  it('createFileAction: accepts arbitrary extensions now — .py, .html, .css, Dockerfile all succeed (no whitelist)', async () => {
+    for (const path of ['script.py', 'index.html', 'style.css', 'Dockerfile']) {
+      mockCreateFile.mockResolvedValueOnce({ commitSha: 'm'.repeat(40), contentSha: 'n'.repeat(40) });
+      const result = await createFileAction({
+        owner: 'dipto',
+        repo: 'notes',
+        branch: 'main',
+        path,
+        content: 'content',
+        message: `Create ${path}`,
+      });
+      expect(result.ok).toBe(true);
+    }
+  });
+
+  it('createFileAction: still rejects an invalid (path-traversal) path regardless of extension', async () => {
     const result = await createFileAction({
       owner: 'dipto',
       repo: 'notes',
       branch: 'main',
-      path: 'image.png',
+      path: '../../etc/passwd',
       content: '',
-      message: 'Create image.png',
+      message: 'nope',
     });
     expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.code).toBe('UNSUPPORTED_FILE');
+    if (!result.ok) expect(result.code).toBe('VALIDATION');
     expect(mockCreateFile).not.toHaveBeenCalled();
   });
 

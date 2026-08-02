@@ -1,9 +1,8 @@
 'use server';
 
 import { getServerAccessToken } from '@/lib/auth/session';
-import { GitHubApiError, GitHubClient } from '@/lib/github/client';
+import { BinaryFileError, GitHubApiError, GitHubClient } from '@/lib/github/client';
 import {
-  isSupportedFile,
   isValidBranchName,
   isValidCommitMessage,
   isValidOwnerOrRepo,
@@ -132,11 +131,13 @@ export async function getFileAction(
     return fail('Invalid repository or branch.', 'VALIDATION');
   }
   if (!isValidRepoPath(path)) return fail('Invalid path.', 'VALIDATION');
-  if (!isSupportedFile(path)) return fail('This file type is not editable here.', 'UNSUPPORTED_FILE');
   try {
     const file = await client.getFile(owner, repo, branch, path);
     return { ok: true, data: file };
   } catch (e) {
+    if (e instanceof BinaryFileError) {
+      return fail(e.message, 'UNSUPPORTED_FILE');
+    }
     if (e instanceof GitHubApiError && e.status === 413) {
       return fail('File is too large to edit here.', 'FILE_TOO_LARGE');
     }
@@ -165,7 +166,6 @@ export async function createFileAction(params: {
     return fail('Invalid repository or branch.', 'VALIDATION');
   }
   if (!isValidRepoPath(path)) return fail('Invalid path.', 'VALIDATION');
-  if (!isSupportedFile(path)) return fail('This file type is not editable here.', 'UNSUPPORTED_FILE');
   if (!isValidCommitMessage(message)) return fail('Commit message is required (max 500 chars).', 'VALIDATION');
 
   try {
@@ -198,7 +198,6 @@ export async function renameFileAction(params: {
   }
   if (!isValidRepoPath(oldPath) || !isValidRepoPath(newPath)) return fail('Invalid path.', 'VALIDATION');
   if (oldPath === newPath) return fail('New path must be different from the current path.', 'VALIDATION');
-  if (!isSupportedFile(newPath)) return fail('This file type is not editable here.', 'UNSUPPORTED_FILE');
   if (!isValidCommitMessage(message)) return fail('Commit message is required (max 500 chars).', 'VALIDATION');
 
   // Rename operates on what's actually on GitHub right now — never on
@@ -270,7 +269,6 @@ export async function commitFileAction(params: {
     return fail('Invalid repository or branch.', 'VALIDATION');
   }
   if (!isValidRepoPath(path)) return fail('Invalid path.', 'VALIDATION');
-  if (!isSupportedFile(path)) return fail('This file type is not editable here.', 'UNSUPPORTED_FILE');
   if (!isValidCommitMessage(message)) return fail('Commit message is required (max 500 chars).', 'VALIDATION');
   if (!isValidSha(sha)) return fail('Missing or invalid file version. Reload and retry.', 'VALIDATION');
 

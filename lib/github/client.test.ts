@@ -200,11 +200,59 @@ describe('GitHubClient integration (canned success responses)', () => {
     ).rejects.toMatchObject({ code: 'SHA_MISMATCH', status: 422 });
   });
 
-  it('getFile: rejects unsupported file types before making a request', async () => {
-    await expect(client.getFile('dipto', 'notes', 'main', 'photo.png')).rejects.toMatchObject({
-      message: expect.stringContaining('Unsupported'),
+  it('getFile: fetches any path regardless of extension — .py, .html, .css all succeed', async () => {
+    for (const [path, text] of [
+      ['script.py', 'print("hi")\n'],
+      ['index.html', '<!doctype html><html></html>'],
+      ['style.css', 'body { color: red; }'],
+      ['Dockerfile', 'FROM node:20\n'],
+    ] as const) {
+      vi.mocked(fetch).mockResolvedValueOnce(
+        mockResponse(200, {
+          name: path,
+          path,
+          sha: 'a'.repeat(40),
+          size: text.length,
+          type: 'file',
+          content: encodeUtf8ToBase64(text),
+        }),
+      );
+      const result = await client.getFile('dipto', 'notes', 'main', path);
+      expect(result.content).toBe(text);
+    }
+  });
+
+  it('getFile: rejects a file whose decoded bytes are not valid UTF-8, even with a misleading extension', async () => {
+    const binaryBytes = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x00, 0x0d, 0x0a]); // PNG-ish header w/ NUL
+    vi.mocked(fetch).mockResolvedValueOnce(
+      mockResponse(200, {
+        name: 'sneaky.md', // extension lies — content is what matters
+        path: 'sneaky.md',
+        sha: 'a'.repeat(40),
+        size: binaryBytes.length,
+        type: 'file',
+        content: binaryBytes.toString('base64'),
+      }),
+    );
+    await expect(client.getFile('dipto', 'notes', 'main', 'sneaky.md')).rejects.toMatchObject({
+      name: 'BinaryFileError',
     });
-    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('getFile: accepts a text file with an unusual/binary-suggesting extension based on real content', async () => {
+    const text = 'this file is actually just text, extension notwithstanding';
+    vi.mocked(fetch).mockResolvedValueOnce(
+      mockResponse(200, {
+        name: 'notes.bin',
+        path: 'notes.bin',
+        sha: 'a'.repeat(40),
+        size: text.length,
+        type: 'file',
+        content: encodeUtf8ToBase64(text),
+      }),
+    );
+    const result = await client.getFile('dipto', 'notes', 'main', 'notes.bin');
+    expect(result.content).toBe(text);
   });
 });
 

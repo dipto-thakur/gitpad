@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  isSupportedFile,
+  isLikelyBinaryPath,
   isValidBranchName,
   isValidCommitMessage,
   isValidOwnerOrRepo,
@@ -45,17 +45,37 @@ describe('isValidRepoPath', () => {
   });
 });
 
-describe('isSupportedFile', () => {
-  it('accepts known extensions and exact names', () => {
-    expect(isSupportedFile('README.md')).toBe(true);
-    expect(isSupportedFile('config.yaml')).toBe(true);
-    expect(isSupportedFile('LICENSE')).toBe(true);
-    expect(isSupportedFile('.gitignore')).toBe(true);
+describe('isLikelyBinaryPath', () => {
+  it('flags known binary extensions (images, video, audio, fonts, archives, executables, office, db)', () => {
+    expect(isLikelyBinaryPath('logo.png')).toBe(true);
+    expect(isLikelyBinaryPath('clip.mp4')).toBe(true);
+    expect(isLikelyBinaryPath('song.mp3')).toBe(true);
+    expect(isLikelyBinaryPath('font.woff2')).toBe(true);
+    expect(isLikelyBinaryPath('archive.zip')).toBe(true);
+    expect(isLikelyBinaryPath('app.exe')).toBe(true);
+    expect(isLikelyBinaryPath('report.pdf')).toBe(true);
+    expect(isLikelyBinaryPath('data.sqlite3')).toBe(true);
   });
-  it('rejects binaries and unknown extensions', () => {
-    expect(isSupportedFile('photo.png')).toBe(false);
-    expect(isSupportedFile('app.exe')).toBe(false);
-    expect(isSupportedFile('archive.zip')).toBe(false);
+
+  it('does NOT flag ordinary text/code files — any extension is fair game now', () => {
+    expect(isLikelyBinaryPath('README.md')).toBe(false);
+    expect(isLikelyBinaryPath('main.py')).toBe(false);
+    expect(isLikelyBinaryPath('index.html')).toBe(false);
+    expect(isLikelyBinaryPath('style.css')).toBe(false);
+    expect(isLikelyBinaryPath('app.tsx')).toBe(false);
+    expect(isLikelyBinaryPath('config.yml')).toBe(false);
+    expect(isLikelyBinaryPath('Dockerfile.dev')).toBe(false);
+  });
+
+  it('does not flag dotfiles or extensionless files', () => {
+    expect(isLikelyBinaryPath('.gitignore')).toBe(false);
+    expect(isLikelyBinaryPath('.env')).toBe(false);
+    expect(isLikelyBinaryPath('LICENSE')).toBe(false);
+    expect(isLikelyBinaryPath('Dockerfile')).toBe(false);
+  });
+
+  it('is case-insensitive on the extension', () => {
+    expect(isLikelyBinaryPath('PHOTO.PNG')).toBe(true);
   });
 });
 

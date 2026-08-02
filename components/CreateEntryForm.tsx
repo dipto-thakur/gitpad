@@ -90,7 +90,7 @@ export function CreateEntryForm({
           autoFocus
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder={mode === 'folder' ? 'folder-name' : 'file-name.md'}
+          placeholder={mode === 'folder' ? 'folder-name' : 'e.g. notes.md, app.py, index.html'}
           onKeyDown={(e) => {
             if (e.key === 'Escape') close();
           }}
