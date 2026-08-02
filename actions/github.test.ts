@@ -7,6 +7,7 @@ vi.mock('@/lib/auth/session', () => ({
 const mockGetFile = vi.fn();
 const mockCommitFile = vi.fn();
 const mockListRepositories = vi.fn();
+const mockDeleteFile = vi.fn();
 
 vi.mock('@/lib/github/client', async () => {
   const actual = await vi.importActual<typeof import('@/lib/github/client')>(
@@ -18,12 +19,18 @@ vi.mock('@/lib/github/client', async () => {
       getFile: mockGetFile,
       commitFile: mockCommitFile,
       listRepositories: mockListRepositories,
+      deleteFile: mockDeleteFile,
     })),
   };
 });
 
 import { GitHubApiError } from '@/lib/github/client';
-import { commitFileAction, getFileAction, listRepositoriesAction } from './github';
+import {
+  commitFileAction,
+  deleteFileAction,
+  getFileAction,
+  listRepositoriesAction,
+} from './github';
 
 const VALID_SHA = 'a'.repeat(40);
 
@@ -32,6 +39,7 @@ describe('server action error mapping (mocked GitHubClient)', () => {
     mockGetFile.mockReset();
     mockCommitFile.mockReset();
     mockListRepositories.mockReset();
+    mockDeleteFile.mockReset();
   });
 
   it('commitFileAction: 409 conflict -> SHA_MISMATCH with reload-and-retry message', async () => {
@@ -122,5 +130,47 @@ describe('server action error mapping (mocked GitHubClient)', () => {
     });
     expect(result.ok).toBe(true);
     if (result.ok) expect(result.data.contentSha).toBe('d'.repeat(40));
+  });
+
+  it('deleteFileAction: succeeds and returns the deletion commit sha', async () => {
+    mockDeleteFile.mockResolvedValueOnce({ commitSha: 'e'.repeat(40) });
+    const result = await deleteFileAction({
+      owner: 'dipto',
+      repo: 'notes',
+      branch: 'main',
+      path: 'old.md',
+      message: 'Remove old.md',
+      sha: VALID_SHA,
+    });
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.data.commitSha).toBe('e'.repeat(40));
+  });
+
+  it('deleteFileAction: 404 (already gone) surfaces as a not-found error, never silently succeeds', async () => {
+    mockDeleteFile.mockRejectedValueOnce(new GitHubApiError('missing', 404, 'NOT_FOUND'));
+    const result = await deleteFileAction({
+      owner: 'dipto',
+      repo: 'notes',
+      branch: 'main',
+      path: 'old.md',
+      message: 'Remove old.md',
+      sha: VALID_SHA,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.code).toBe('NOT_FOUND');
+  });
+
+  it('deleteFileAction: rejects an empty commit message before calling GitHubClient', async () => {
+    const result = await deleteFileAction({
+      owner: 'dipto',
+      repo: 'notes',
+      branch: 'main',
+      path: 'old.md',
+      message: '   ',
+      sha: VALID_SHA,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.code).toBe('VALIDATION');
+    expect(mockDeleteFile).not.toHaveBeenCalled();
   });
 });

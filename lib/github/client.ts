@@ -3,7 +3,7 @@ import { decodeBase64ToUtf8, encodeUtf8ToBase64, MAX_EDITABLE_FILE_BYTES } from 
 import type { BranchSummary, FileContent, RepoSummary, TreeEntry } from '@/types';
 import { isSupportedFile } from '@/lib/validation';
 
-const GITHUB_API = 'https://api.github.com';
+const GITHUB_API = process.env.GITHUB_API_BASE_URL ?? 'https://api.github.com';
 
 export class GitHubApiError extends Error {
   status: number;
@@ -92,9 +92,10 @@ export class GitHubClient {
       .map(encodeURIComponent)
       .join('/');
     const qs = `?ref=${encodeURIComponent(branch)}`;
-    const items = await this.request<GhContentItem[] | GhContentItem>(
-      `/repos/${owner}/${repo}/contents/${encodedPath}${qs}`,
-    );
+    const url = encodedPath
+      ? `/repos/${owner}/${repo}/contents/${encodedPath}${qs}`
+      : `/repos/${owner}/${repo}/contents${qs}`;
+    const items = await this.request<GhContentItem[] | GhContentItem>(url);
     const list = Array.isArray(items) ? items : [items];
     return list
       .map((item) => toTreeEntry(item))

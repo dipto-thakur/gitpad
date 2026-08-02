@@ -11,6 +11,166 @@ function mockResponse(status: number, body: unknown) {
   } as Response;
 }
 
+describe('GitHubClient integration (canned success responses)', () => {
+  const client = new GitHubClient('fake-token');
+
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn());
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('listRepositories: maps GitHub repo list shape to RepoSummary[]', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      mockResponse(200, [
+        {
+          id: 1,
+          name: 'notes',
+          full_name: 'dipto/notes',
+          private: false,
+          default_branch: 'main',
+          updated_at: '2026-07-01T00:00:00Z',
+          owner: { login: 'dipto' },
+        },
+        {
+          id: 2,
+          name: 'forgecv',
+          full_name: 'dipto/forgecv',
+          private: true,
+          default_branch: 'main',
+          updated_at: '2026-07-15T00:00:00Z',
+          owner: { login: 'dipto' },
+        },
+      ]),
+    );
+    const repos = await client.listRepositories();
+    expect(repos).toEqual([
+      {
+        id: 1,
+        owner: 'dipto',
+        name: 'notes',
+        fullName: 'dipto/notes',
+        private: false,
+        defaultBranch: 'main',
+        updatedAt: '2026-07-01T00:00:00Z',
+      },
+      {
+        id: 2,
+        owner: 'dipto',
+        name: 'forgecv',
+        fullName: 'dipto/forgecv',
+        private: true,
+        defaultBranch: 'main',
+        updatedAt: '2026-07-15T00:00:00Z',
+      },
+    ]);
+  });
+
+  it('listBranches: maps GitHub branch list shape to BranchSummary[]', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      mockResponse(200, [
+        { name: 'main', protected: true },
+        { name: 'dev', protected: false },
+      ]),
+    );
+    const branches = await client.listBranches('dipto', 'notes');
+    expect(branches).toEqual([
+      { name: 'main', protected: true },
+      { name: 'dev', protected: false },
+    ]);
+  });
+
+  it('getRepo: maps a single GitHub repo response', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      mockResponse(200, {
+        id: 1,
+        name: 'notes',
+        full_name: 'dipto/notes',
+        private: false,
+        default_branch: 'main',
+        updated_at: '2026-07-01T00:00:00Z',
+        owner: { login: 'dipto' },
+      }),
+    );
+    const repo = await client.getRepo('dipto', 'notes');
+    expect(repo.fullName).toBe('dipto/notes');
+    expect(repo.defaultBranch).toBe('main');
+  });
+
+  it('listTree: requests repo root without a trailing slash before the query string', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(mockResponse(200, []));
+    await client.listTree('dipto', 'notes', 'main', '');
+    const calledUrl = vi.mocked(fetch).mock.calls[0]![0] as string;
+    expect(calledUrl).toBe('https://api.github.com/repos/dipto/notes/contents?ref=main');
+  });
+
+  it('listTree: sorts directories before files, then alphabetically, and flags unsupported files', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      mockResponse(200, [
+        { name: 'zeta.md', path: 'zeta.md', sha: 'z'.repeat(40), size: 10, type: 'file' },
+        { name: 'assets', path: 'assets', sha: 'a'.repeat(40), type: 'dir' },
+        { name: 'logo.png', path: 'logo.png', sha: 'p'.repeat(40), size: 2048, type: 'file' },
+        { name: 'README.md', path: 'README.md', sha: 'r'.repeat(40), size: 20, type: 'file' },
+      ]),
+    );
+    const entries = await client.listTree('dipto', 'notes', 'main', '');
+    expect(entries.map((e) => e.name)).toEqual(['assets', 'logo.png', 'README.md', 'zeta.md']);
+    expect(entries.find((e) => e.name === 'logo.png')?.supported).toBe(false);
+    expect(entries.find((e) => e.name === 'README.md')?.supported).toBe(true);
+  });
+
+  it('listTree: wraps a single-file response (GitHub returns an object, not array, for one file)', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      mockResponse(200, { name: 'README.md', path: 'README.md', sha: 'r'.repeat(40), size: 5, type: 'file' }),
+    );
+    const entries = await client.listTree('dipto', 'notes', 'main', 'README.md');
+    expect(entries).toHaveLength(1);
+    expect(entries[0]!.name).toBe('README.md');
+  });
+
+  it('commitFile: returns commit and content sha on success', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      mockResponse(200, {
+        content: { sha: 'd'.repeat(40) },
+        commit: { sha: 'c'.repeat(40) },
+      }),
+    );
+    const result = await client.commitFile({
+      owner: 'dipto',
+      repo: 'notes',
+      branch: 'main',
+      path: 'README.md',
+      content: 'updated body',
+      message: 'Update README',
+      sha: 'a'.repeat(40),
+    });
+    expect(result).toEqual({ commitSha: 'c'.repeat(40), contentSha: 'd'.repeat(40) });
+  });
+
+  it('deleteFile: returns the deletion commit sha on success', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      mockResponse(200, { content: null, commit: { sha: 'e'.repeat(40) } }),
+    );
+    const result = await client.deleteFile({
+      owner: 'dipto',
+      repo: 'notes',
+      branch: 'main',
+      path: 'old.md',
+      message: 'Remove old.md',
+      sha: 'a'.repeat(40),
+    });
+    expect(result).toEqual({ commitSha: 'e'.repeat(40) });
+  });
+
+  it('getFile: rejects unsupported file types before making a request', async () => {
+    await expect(client.getFile('dipto', 'notes', 'main', 'photo.png')).rejects.toMatchObject({
+      message: expect.stringContaining('Unsupported'),
+    });
+    expect(fetch).not.toHaveBeenCalled();
+  });
+});
+
 describe('GitHubClient integration (mocked fetch)', () => {
   const client = new GitHubClient('fake-token');
 
