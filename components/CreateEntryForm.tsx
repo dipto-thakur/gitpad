@@ -1,8 +1,15 @@
+// file: components/CreateEntryForm.tsx
 'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { FilePlus, FolderPlus } from 'lucide-react';
 import { createFileAction } from '@/actions/github';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerBody, DrawerFooter } from '@/components/ui/drawer';
+import { Row } from '@/components/ui/row';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { InlineBanner } from '@/components/ui/inline-banner';
 
 export function CreateEntryForm({
   owner,
@@ -17,20 +24,22 @@ export function CreateEntryForm({
   basePath: string;
   onCreated: () => void;
 }) {
-  const [mode, setMode] = useState<'closed' | 'file' | 'folder'>('closed');
+  const [mode, setMode] = useState<'file' | 'folder' | null>(null);
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState<'idle' | 'creating' | 'error'>('idle');
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  function close() {
-    if (status === 'creating') return;
-    setMode('closed');
-    setName('');
-    setMessage('');
-    setError(null);
-    setStatus('idle');
+  function close(open: boolean) {
+    if (!open) {
+      if (status === 'creating') return;
+      setMode(null);
+      setName('');
+      setMessage('');
+      setError(null);
+      setStatus('idle');
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -38,13 +47,10 @@ export function CreateEntryForm({
     const trimmed = name.trim();
     if (!trimmed) return;
 
-    // GitHub has no real empty-folder concept — a folder only exists
-    // implicitly via file paths inside it. Create a placeholder file, same
-    // as `git`'s own .gitkeep convention.
+    // GitHub has no real empty-folder concept — create a placeholder file,
+    // same as git's own .gitkeep convention.
     const path =
-      mode === 'folder'
-        ? [basePath, trimmed, '.gitkeep'].filter(Boolean).join('/')
-        : [basePath, trimmed].filter(Boolean).join('/');
+      mode === 'folder' ? [basePath, trimmed, '.gitkeep'].filter(Boolean).join('/') : [basePath, trimmed].filter(Boolean).join('/');
 
     setStatus('creating');
     setError(null);
@@ -62,68 +68,52 @@ export function CreateEntryForm({
       return;
     }
     const createdFile = mode === 'file';
-    close();
+    close(false);
     onCreated();
     if (createdFile) {
       router.push(`/repos/${owner}/${repo}/edit/${path}?branch=${encodeURIComponent(branch)}`);
     }
   }
 
-  if (mode === 'closed') {
-    return (
-      <div className="mb-2 flex gap-3 px-2">
-        <button type="button" onClick={() => setMode('file')} className="text-xs text-muted hover:text-fg">
-          + New file
-        </button>
-        <button type="button" onClick={() => setMode('folder')} className="text-xs text-muted hover:text-fg">
-          + New folder
-        </button>
-      </div>
-    );
-  }
-
   return (
-    <form onSubmit={handleSubmit} className="mb-2 flex flex-col gap-1.5 rounded-md border border-border p-2">
-      <div className="flex items-center gap-2">
-        {basePath && <span className="text-xs text-muted">{basePath}/</span>}
-        <input
-          autoFocus
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder={mode === 'folder' ? 'folder-name' : 'e.g. notes.md, app.py, index.html'}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') close();
-          }}
-          className="flex-1 rounded-md border border-border px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-fg"
-        />
+    <>
+      <div className="flex">
+        <Row icon={<FilePlus />} label="New file" onClick={() => setMode('file')} className="flex-1" />
+        <Row icon={<FolderPlus />} label="New folder" onClick={() => setMode('folder')} className="flex-1" />
       </div>
-      <input
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        placeholder="Commit message (optional)"
-        maxLength={500}
-        className="rounded-md border border-border px-2 py-1 text-xs outline-none focus:ring-1 focus:ring-fg"
-      />
-      {status === 'error' && error && (
-        <p className="rounded-md border border-border bg-red-50 px-2 py-1 text-xs text-red-700">{error}</p>
-      )}
-      <div className="flex justify-end gap-2">
-        <button
-          type="button"
-          onClick={close}
-          disabled={status === 'creating'}
-          className="text-xs text-muted hover:text-fg disabled:opacity-40"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={name.trim().length === 0 || status === 'creating'}
-          className="rounded-md bg-fg px-2 py-1 text-xs font-medium text-white disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          {status === 'creating' ? 'Creating…' : mode === 'folder' ? 'Create folder' : 'Create file'}
-        </button>
-      </div>
-    </form>
+
+      <Drawer open={mode !== null} onOpenChange={close}>
+        <DrawerContent open={mode !== null}>
+          <form onSubmit={handleSubmit}>
+            <DrawerHeader>
+              <DrawerTitle>{mode === 'folder' ? 'New folder' : 'New file'}</DrawerTitle>
+            </DrawerHeader>
+            <DrawerBody className="flex flex-col gap-3">
+              <Input
+                autoFocus
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder={mode === 'folder' ? 'folder-name' : 'e.g. notes.md, app.py, index.html'}
+              />
+              <Input
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Commit message (optional)"
+                maxLength={500}
+              />
+              {status === 'error' && error && <InlineBanner variant="error">{error}</InlineBanner>}
+            </DrawerBody>
+            <DrawerFooter>
+              <Button type="button" variant="ghost" onClick={() => close(false)} disabled={status === 'creating'}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={name.trim().length === 0 || status === 'creating'}>
+                {status === 'creating' ? 'Creating…' : mode === 'folder' ? 'Create folder' : 'Create file'}
+              </Button>
+            </DrawerFooter>
+          </form>
+        </DrawerContent>
+      </Drawer>
+    </>
   );
 }

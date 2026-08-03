@@ -1,10 +1,15 @@
+// file: components/FileBrowser.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { Folder, FileText } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { listTreeAction } from '@/actions/github';
 import type { TreeEntry } from '@/types';
 import { CreateEntryForm } from '@/components/CreateEntryForm';
+import { Row, RowLink } from '@/components/ui/row';
+import { Skeleton } from '@/components/ui/skeleton';
+import { InlineBanner } from '@/components/ui/inline-banner';
 
 export function FileBrowser({
   owner,
@@ -47,90 +52,73 @@ export function FileBrowser({
     });
   }
 
-  const createForm = (
-    <CreateEntryForm
-      owner={owner}
-      repo={repo}
-      branch={branch}
-      basePath={path}
-      onCreated={() => setReloadToken((t) => t + 1)}
-    />
-  );
-
-  if (error) {
-    return (
-      <div style={{ paddingLeft: depth === 0 ? 0 : 16 }}>
-        {createForm}
-        <p className="text-sm text-red-700">{error}</p>
-      </div>
-    );
-  }
-
-  if (entries === null) {
-    return (
-      <div style={{ paddingLeft: depth === 0 ? 0 : 16 }}>
-        {createForm}
-        <p className="text-sm text-muted">Loading…</p>
-      </div>
-    );
-  }
-
-  if (entries.length === 0) {
-    return (
-      <div style={{ paddingLeft: depth === 0 ? 0 : 16 }}>
-        {createForm}
-        <p className="text-sm text-muted">Empty directory.</p>
-      </div>
-    );
-  }
-
   return (
-    <div style={{ paddingLeft: depth === 0 ? 0 : 16 }}>
-      {createForm}
-      <ul className="space-y-0.5">
-      {entries.map((entry) => (
-        <li key={entry.path}>
-          {entry.type === 'dir' ? (
-            <>
-              <button
-                onClick={() => toggleDir(entry.path)}
-                className="flex w-full items-center gap-1.5 rounded px-2 py-1 text-left text-sm hover:bg-gray-50"
-              >
-                <span className="text-muted">{openDirs.has(entry.path) ? '▾' : '▸'}</span>
-                <span>{entry.name}/</span>
-              </button>
-              {openDirs.has(entry.path) && (
-                <FileBrowser
-                  owner={owner}
-                  repo={repo}
-                  branch={branch}
-                  path={entry.path}
-                  depth={depth + 1}
+    <div className={depth === 0 ? '' : 'ml-3 border-l border-border pl-1'}>
+      <CreateEntryForm owner={owner} repo={repo} branch={branch} basePath={path} onCreated={() => setReloadToken((t) => t + 1)} />
+
+      {error && (
+        <div className="px-3 py-2">
+          <InlineBanner variant="error">{error}</InlineBanner>
+        </div>
+      )}
+
+      {!error && entries === null && (
+        <div className="flex flex-col gap-1 px-3 py-1">
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-3/4" />
+          <Skeleton className="h-10 w-1/2" />
+        </div>
+      )}
+
+      {!error && entries !== null && entries.length === 0 && (
+        <p className="px-3 py-6 text-sm text-muted-foreground">Empty directory. Create the first file above.</p>
+      )}
+
+      {!error && entries !== null && entries.length > 0 && (
+        <ul>
+          {entries.map((entry) => (
+            <li key={entry.path}>
+              {entry.type === 'dir' ? (
+                <>
+                  <Row
+                    icon={<Folder />}
+                    label={`${entry.name}/`}
+                    onClick={() => toggleDir(entry.path)}
+                    aria-expanded={openDirs.has(entry.path)}
+                  />
+                  <AnimatePresence initial={false}>
+                    {openDirs.has(entry.path) && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.15 }}
+                        className="overflow-hidden"
+                      >
+                        <FileBrowser owner={owner} repo={repo} branch={branch} path={entry.path} depth={depth + 1} />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </>
+              ) : entry.supported ? (
+                <RowLink
+                  href={`/repos/${owner}/${repo}/edit/${entry.path}?branch=${encodeURIComponent(branch)}`}
+                  icon={<FileText />}
+                  label={entry.name}
+                />
+              ) : (
+                <RowLink
+                  href={`/repos/${owner}/${repo}/edit/${entry.path}?branch=${encodeURIComponent(branch)}`}
+                  icon={<FileText />}
+                  label={entry.name}
+                  meta="likely binary"
+                  className="text-muted-foreground"
                 />
               )}
-            </>
-          ) : entry.supported ? (
-            <Link
-              href={`/repos/${owner}/${repo}/edit/${entry.path}?branch=${encodeURIComponent(branch)}`}
-              className="flex items-center gap-1.5 rounded px-2 py-1 text-sm hover:bg-gray-50"
-            >
-              <span className="text-muted">·</span>
-              <span>{entry.name}</span>
-            </Link>
-          ) : (
-            <Link
-              href={`/repos/${owner}/${repo}/edit/${entry.path}?branch=${encodeURIComponent(branch)}`}
-              title="Extension suggests a binary file — opening will confirm"
-              className="flex items-center gap-1.5 rounded px-2 py-1 text-sm text-muted/60 hover:bg-gray-50"
-            >
-              <span>·</span>
-              <span>{entry.name}</span>
-              <span className="text-xs">(likely binary)</span>
-            </Link>
-          )}
-        </li>
-      ))}
-      </ul>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

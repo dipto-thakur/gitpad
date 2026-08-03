@@ -1,7 +1,12 @@
+// file: components/RepoSearch.tsx
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
+import { Star, FolderGit2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { RowLink } from '@/components/ui/row';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 import type { RepoSummary } from '@/types';
 
 const FAVORITES_KEY = 'gh-doc-editor:favorites';
@@ -23,12 +28,20 @@ export function RepoSearch({ repos }: { repos: RepoSummary[] }) {
 
   function toggleFavorite(fullName: string) {
     setFavorites((prev) => {
-      const next = prev.includes(fullName)
-        ? prev.filter((f) => f !== fullName)
-        : [...prev, fullName];
+      const next = prev.includes(fullName) ? prev.filter((f) => f !== fullName) : [...prev, fullName];
       localStorage.setItem(FAVORITES_KEY, JSON.stringify(next));
       return next;
     });
+  }
+
+  function recordRecent(fullName: string) {
+    try {
+      const current: string[] = JSON.parse(localStorage.getItem(RECENTS_KEY) ?? '[]');
+      const next = [fullName, ...current.filter((f) => f !== fullName)].slice(0, 8);
+      localStorage.setItem(RECENTS_KEY, JSON.stringify(next));
+    } catch {
+      // ignore
+    }
   }
 
   const filtered = useMemo(() => {
@@ -44,70 +57,74 @@ export function RepoSearch({ repos }: { repos: RepoSummary[] }) {
 
   const recentRepos = repos.filter((r) => recents.includes(r.fullName)).slice(0, 5);
 
-  function recordRecent(fullName: string) {
-    try {
-      const current: string[] = JSON.parse(localStorage.getItem(RECENTS_KEY) ?? '[]');
-      const next = [fullName, ...current.filter((f) => f !== fullName)].slice(0, 8);
-      localStorage.setItem(RECENTS_KEY, JSON.stringify(next));
-    } catch {
-      // ignore
-    }
-  }
-
   return (
-    <div>
-      <input
+    <div className="flex flex-col gap-6">
+      <Input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search repositories…"
-        className="mb-4 w-full rounded-md border border-border px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-fg"
+        placeholder="Search repositories"
+        aria-label="Search repositories"
       />
 
       {recentRepos.length > 0 && !query && (
-        <div className="mb-6">
-          <h2 className="mb-2 text-xs font-medium uppercase text-muted">Recent</h2>
-          <ul className="space-y-1">
+        <section>
+          <h2 className="mb-1 px-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">Recent</h2>
+          <ul>
             {recentRepos.map((r) => (
-              <RepoRow key={r.id} repo={r} onOpen={recordRecent} />
+              <RepoRow key={r.id} repo={r} favorite={favorites.includes(r.fullName)} onToggleFavorite={toggleFavorite} onOpen={recordRecent} />
             ))}
           </ul>
-        </div>
+        </section>
       )}
 
-      <h2 className="mb-2 text-xs font-medium uppercase text-muted">All</h2>
-      <ul className="space-y-1">
-        {filtered.map((r) => (
-          <li key={r.id} className="flex items-center gap-2">
-            <button
-              aria-label={favorites.includes(r.fullName) ? 'Unfavorite' : 'Favorite'}
-              onClick={() => toggleFavorite(r.fullName)}
-              className="text-sm text-muted hover:text-fg"
-            >
-              {favorites.includes(r.fullName) ? '★' : '☆'}
-            </button>
-            <RepoRow repo={r} onOpen={recordRecent} />
-          </li>
-        ))}
-        {filtered.length === 0 && (
-          <li className="text-sm text-muted">No repositories match.</li>
+      <section>
+        <h2 className="mb-1 px-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">All</h2>
+        {filtered.length === 0 ? (
+          <p className="px-3 py-6 text-sm text-muted-foreground">No repositories match "{query}".</p>
+        ) : (
+          <ul>
+            {filtered.map((r) => (
+              <RepoRow key={r.id} repo={r} favorite={favorites.includes(r.fullName)} onToggleFavorite={toggleFavorite} onOpen={recordRecent} />
+            ))}
+          </ul>
         )}
-      </ul>
+      </section>
     </div>
   );
 }
 
-function RepoRow({ repo, onOpen }: { repo: RepoSummary; onOpen: (fullName: string) => void }) {
+function RepoRow({
+  repo,
+  favorite,
+  onToggleFavorite,
+  onOpen,
+}: {
+  repo: RepoSummary;
+  favorite: boolean;
+  onToggleFavorite: (fullName: string) => void;
+  onOpen: (fullName: string) => void;
+}) {
   return (
-    <Link
-      href={`/repos/${repo.owner}/${repo.name}`}
-      onClick={() => onOpen(repo.fullName)}
-      className="flex flex-1 items-center justify-between rounded-md px-2 py-1.5 text-sm hover:bg-gray-50"
-    >
-      <span>{repo.fullName}</span>
-      <span className="flex items-center gap-2 text-xs text-muted">
-        {repo.private ? 'Private' : 'Public'}
-        <span>{repo.defaultBranch}</span>
-      </span>
-    </Link>
+    <li className="flex items-center gap-1">
+      <motion.button
+        type="button"
+        whileTap={{ scale: 0.9 }}
+        aria-label={favorite ? 'Remove from favorites' : 'Add to favorites'}
+        aria-pressed={favorite}
+        onClick={() => onToggleFavorite(repo.fullName)}
+        className="flex h-12 w-9 shrink-0 items-center justify-center text-muted-foreground"
+      >
+        <Star className={cn('h-4 w-4', favorite && 'fill-foreground text-foreground')} />
+      </motion.button>
+      <RowLink
+        href={`/repos/${repo.owner}/${repo.name}`}
+        onClick={() => onOpen(repo.fullName)}
+        icon={<FolderGit2 />}
+        label={repo.name}
+        meta={repo.private ? 'Private' : 'Public'}
+        chevron
+        className="flex-1"
+      />
+    </li>
   );
 }

@@ -1,27 +1,32 @@
-import Link from 'next/link';
+// file: app/repos/page.tsx
 import { listRepositoriesAction } from '@/actions/github';
 import { getCurrentUser } from '@/lib/auth/session';
-import { SignOutButton } from '@/components/SignOutButton';
+import { SignOutButton } from '@/components/sign/SignOutButton';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
 import { RepoSearch } from '@/components/RepoSearch';
+import { InlineBanner } from '@/components/ui/inline-banner';
 
 export default async function ReposPage() {
   const user = await getCurrentUser();
   const result = await listRepositoriesAction();
 
   return (
-    <main className="mx-auto max-w-2xl px-6 py-10">
-      <header className="mb-8 flex items-center justify-between">
+    <main className="mx-auto flex min-h-dvh max-w-md flex-col px-4 pb-8">
+      <header className="sticky top-0 z-10 flex items-center justify-between gap-2 bg-background py-4">
         <div>
-          <h1 className="text-lg font-semibold">Repositories</h1>
-          {user && <p className="text-sm text-muted">Signed in as {user.login}</p>}
+          <h1 className="text-base font-medium text-foreground">Repositories</h1>
+          {user && <p className="text-xs text-muted-foreground">{user.login}</p>}
         </div>
-        <SignOutButton />
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
+          <SignOutButton />
+        </div>
       </header>
 
       {!result.ok && (
-        <p className="rounded-md border border-border bg-red-50 px-4 py-3 text-sm text-red-700">
-          {result.error}
-        </p>
+        <div className="mt-2">
+          <InlineBanner variant="error">{result.error}</InlineBanner>
+        </div>
       )}
 
       {result.ok && <RepoSearch repos={result.data} />}
