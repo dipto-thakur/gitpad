@@ -84,6 +84,73 @@ export class GitHubClient {
     return (await res.json()) as T;
   }
 
+  /**
+   * GraphQL has its own response shape — a 200 with an `errors` array is a
+   * failure, unlike REST where failure means non-2xx. Kept separate from
+   * request() rather than overloading it with a GraphQL-aware branch.
+   */
+  private async graphqlRequest<T>(query: string): Promise<T> {
+    let res: Response;
+    try {
+      res = await fetch(`${GITHUB_API}/graphql`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query }),
+        cache: 'no-store',
+      });
+    } catch {
+      throw new GitHubApiError('Network error contacting GitHub', 0, 'NETWORK');
+    }
+
+    if (!res.ok) {
+      throw new GitHubApiError(`GitHub GraphQL error (${res.status})`, res.status, classify(res.status));
+    }
+
+    const json = (await res.json()) as { data?: T; errors?: { message: string }[] };
+    if (json.errors && json.errors.length > 0) {
+      throw new GitHubApiError(json.errors[0]!.message.slice(0, 200), 200, 'UNKNOWN');
+    }
+    if (!json.data) {
+      throw new GitHubApiError('GitHub GraphQL returned no data', 200, 'UNKNOWN');
+    }
+    return json.data;
+  }
+
+  /**
+   * Total contributions in the past year and the current consecutive-day
+   * streak, for the profile drawer. Purely informational — callers should
+   * treat failures here as non-fatal (see actions/profile.ts).
+   */
+  async getContributionStats(): Promise<{ totalContributions: number; currentStreak: number }> {
+    const query = `
+      query {
+        viewer {
+          contributionsCollection {
+            contributionCalendar {
+              totalContributions
+              weeks {
+                contributionDays {
+                  date
+                  contributionCount
+                }
+              }
+            }
+          }
+        }
+      }
+    `;
+    const data = await this.graphqlRequest<GhContributionsData>(query);
+    const calendar = data.viewer.contributionsCollection.contributionCalendar;
+    const days = calendar.weeks.flatMap((w) => w.contributionDays);
+    return {
+      totalContributions: calendar.totalContributions,
+      currentStreak: computeCurrentStreak(days),
+    };
+  }
+
   async listRepositories(): Promise<RepoSummary[]> {
     const repos = await this.request<GhRepo[]>(
       '/user/repos?per_page=100&sort=updated&affiliation=owner,collaborator,organization_member',
@@ -246,6 +313,30 @@ export class GitHubClient {
   }
 }
 
+/**
+ * Counts consecutive days with at least one contribution, walking backward
+ * from the most recent day in `days` (chronological order, oldest first —
+ * GitHub's contributionCalendar.weeks shape). Today is allowed to have zero
+ * contributions without breaking the streak, since the day isn't over yet;
+ * any earlier zero-contribution day stops the count. Exported for testing.
+ */
+export function computeCurrentStreak(days: { date: string; contributionCount: number }[]): number {
+  let streak = 0;
+  let skippedToday = false;
+  for (let i = days.length - 1; i >= 0; i--) {
+    const day = days[i]!;
+    if (day.contributionCount > 0) {
+      streak++;
+    } else if (i === days.length - 1 && !skippedToday) {
+      skippedToday = true;
+      continue;
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
 function sanitizeErrorBody(body: string): string {
   // Never surface raw response bodies (may contain internal detail); return
   // a short, generic excerpt only.
@@ -306,6 +397,17 @@ interface GhContentItem {
   size?: number;
   type: 'file' | 'dir' | 'symlink' | 'submodule';
   content?: string;
+}
+
+interface GhContributionsData {
+  viewer: {
+    contributionsCollection: {
+      contributionCalendar: {
+        totalContributions: number;
+        weeks: { contributionDays: { date: string; contributionCount: number }[] }[];
+      };
+    };
+  };
 }
 
 interface GhCommitResponse {

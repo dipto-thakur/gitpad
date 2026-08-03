@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { GitHubApiError, GitHubClient } from './client';
+import { computeCurrentStreak, GitHubApiError, GitHubClient } from './client';
 import { encodeUtf8ToBase64 } from '@/lib/encoding/base64';
 
 function mockResponse(status: number, body: unknown) {
@@ -366,5 +366,83 @@ describe('GitHubClient integration (mocked fetch)', () => {
     }
     expect(caught).toBeInstanceOf(GitHubApiError);
     expect(caught!.message.length).toBeLessThan(longMessage.length);
+  });
+});
+
+describe('computeCurrentStreak (pure function)', () => {
+  function day(date: string, count: number) {
+    return { date, contributionCount: count };
+  }
+
+  it('counts back from the most recent day while contributions continue', () => {
+    const days = [day('2026-07-30', 1), day('2026-07-31', 2), day('2026-08-01', 3)];
+    expect(computeCurrentStreak(days)).toBe(3);
+  });
+
+  it('stops at the first zero-contribution day before today', () => {
+    const days = [day('2026-07-30', 0), day('2026-07-31', 5), day('2026-08-01', 2)];
+    expect(computeCurrentStreak(days)).toBe(2);
+  });
+
+  it('does not break the streak if only today has zero contributions yet', () => {
+    const days = [day('2026-07-30', 4), day('2026-07-31', 1), day('2026-08-01', 0)];
+    expect(computeCurrentStreak(days)).toBe(2);
+  });
+
+  it('returns 0 when today and yesterday both have zero contributions', () => {
+    const days = [day('2026-07-30', 3), day('2026-07-31', 0), day('2026-08-01', 0)];
+    expect(computeCurrentStreak(days)).toBe(0);
+  });
+
+  it('returns 0 for an empty calendar', () => {
+    expect(computeCurrentStreak([])).toBe(0);
+  });
+});
+
+describe('GitHubClient.getContributionStats (GraphQL, mocked fetch)', () => {
+  const client = new GitHubClient('fake-token');
+
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn());
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('parses totalContributions and computes the streak from the calendar', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      mockResponse(200, {
+        data: {
+          viewer: {
+            contributionsCollection: {
+              contributionCalendar: {
+                totalContributions: 512,
+                weeks: [
+                  { contributionDays: [{ date: '2026-07-30', contributionCount: 2 }] },
+                  { contributionDays: [{ date: '2026-07-31', contributionCount: 1 }] },
+                  { contributionDays: [{ date: '2026-08-01', contributionCount: 0 }] },
+                ],
+              },
+            },
+          },
+        },
+      }),
+    );
+    const result = await client.getContributionStats();
+    expect(result).toEqual({ totalContributions: 512, currentStreak: 2 });
+
+    const [url, init] = vi.mocked(fetch).mock.calls[0]!;
+    expect(url).toBe('https://api.github.com/graphql');
+    expect((init as RequestInit).method).toBe('POST');
+  });
+
+  it('a 200 response with a GraphQL errors array is treated as a failure', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(mockResponse(200, { errors: [{ message: 'Bad credentials' }] }));
+    await expect(client.getContributionStats()).rejects.toMatchObject({ message: 'Bad credentials' });
+  });
+
+  it('non-2xx from the GraphQL endpoint maps through the normal status classifier', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(mockResponse(403, { message: 'Bad credentials' }));
+    await expect(client.getContributionStats()).rejects.toMatchObject({ code: 'FORBIDDEN', status: 403 });
   });
 });
