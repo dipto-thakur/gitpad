@@ -1,12 +1,5 @@
 // file: components/icons/GithubMark.tsx
 import type { SVGProps } from 'react';
-
-/**
- * lucide-react removed brand/logo icons (Github, Twitter, etc.) from its
- * core set. This is a minimal stand-in drawn to match Lucide's own
- * conventions (24x24 viewBox, ~1.5-2px stroke, currentColor) so it reads as
- * part of the same icon family rather than a mismatched import.
- */
 export function GithubMark(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
