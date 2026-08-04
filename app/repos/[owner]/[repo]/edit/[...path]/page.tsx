@@ -8,12 +8,12 @@ export default async function EditFilePage({
   params,
   searchParams,
 }: {
-  params: { owner: string; repo: string; path: string[] };
-  searchParams: { branch?: string };
+  params: Promise<{ owner: string; repo: string; path: string[] }>;
+  searchParams: Promise<{ branch?: string }>;
 }) {
-  const { owner, repo } = params;
-  const path = params.path.map(decodeURIComponent).join('/');
-  const branch = searchParams.branch;
+  const { owner, repo, path: pathSegments } = await params;
+  const { branch } = await searchParams;
+  const path = pathSegments.map(decodeURIComponent).join('/');
 
   if (!branch) {
     return <ErrorState owner={owner} repo={repo} message="A branch is required to open this file." />;
