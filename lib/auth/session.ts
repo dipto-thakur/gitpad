@@ -22,7 +22,7 @@ export async function getCurrentUser(): Promise<{ login: string; name?: string |
  * components, and its return value must never be sent to the browser.
  */
 export async function getServerAccessToken(): Promise<string | null> {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const secureCookie = (process.env.NEXTAUTH_URL ?? '').startsWith('https://');
   const token = await getToken({
     req: { cookies: Object.fromEntries(cookieStore.getAll().map((c) => [c.name, c.value])) } as unknown as Parameters<typeof getToken>[0]['req'],
