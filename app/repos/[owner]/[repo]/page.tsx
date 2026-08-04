@@ -1,4 +1,4 @@
-// file: app\repos\[owner]\[repo]\page.tsx
+// file: app/repos/[owner]/[repo]/page.tsx
 import { getRepoAction, listBranchesAction } from '@/actions/github';
 import { FileBrowser } from '@/components/FileBrowser';
 import { BranchSwitcher } from '@/components/BranchSwitcher';
@@ -9,10 +9,11 @@ export default async function RepoPage({
   params,
   searchParams,
 }: {
-  params: { owner: string; repo: string };
-  searchParams: { branch?: string };
+  params: Promise<{ owner: string; repo: string }>;
+  searchParams: Promise<{ branch?: string }>;
 }) {
-  const { owner, repo } = params;
+  const { owner, repo } = await params;
+  const { branch: requestedBranch } = await searchParams;
 
   const repoResult = await getRepoAction(owner, repo);
   if (!repoResult.ok) {
@@ -24,7 +25,7 @@ export default async function RepoPage({
     return <ErrorState message={branchesResult.error} />;
   }
 
-  const activeBranch = searchParams.branch || repoResult.data.defaultBranch;
+  const activeBranch = requestedBranch || repoResult.data.defaultBranch;
   const isKnownBranch = branchesResult.data.some((b) => b.name === activeBranch);
   const branch = isKnownBranch ? activeBranch : repoResult.data.defaultBranch;
 
@@ -34,8 +35,8 @@ export default async function RepoPage({
         <Header
           backHref="/repos"
           backLabel="Repositories"
-          title={'Repositories'}
-          subtitle={''}
+          title={repoResult.data.name}
+          subtitle={owner}
           actions={
             <BranchSwitcher
               owner={owner}
