@@ -53,21 +53,20 @@ export function EditorActionsMenu({
             )}
           </DrawerHeader>
 
-          <ul className="flex flex-col gap-0.5 px-1 pb-3 pt-1">
-            <li>
-              <Row
-                icon={<Pencil className="h-[17px] w-[17px]" />}
-                label="Rename"
-                onClick={() => {
-                  setMenuOpen(false);
-                  setRenameOpen(true);
-                }}
-              />
-            </li>
+          <div className="flex flex-col gap-3 px-3 pb-3 pt-1">
+            <Row
+              icon={<Pencil className="h-[17px] w-[17px]" />}
+              label="Rename"
+              onClick={() => {
+                setMenuOpen(false);
+                setRenameOpen(true);
+              }}
+            />
 
-            <li className="my-1 h-px bg-zinc-100 dark:bg-zinc-800" role="separator" />
-
-            <li>
+            <div className="rounded-xl border border-red-200/70 bg-red-50/50 p-1 dark:border-red-900/40 dark:bg-red-950/20">
+              <p className="px-2.5 pb-1 pt-2 text-[11px] font-medium uppercase tracking-wider text-red-400 dark:text-red-500/80">
+                Danger zone
+              </p>
               <Row
                 icon={<Trash2 className="h-[17px] w-[17px]" />}
                 label="Delete file"
@@ -77,8 +76,8 @@ export function EditorActionsMenu({
                   setDeleteOpen(true);
                 }}
               />
-            </li>
-          </ul>
+            </div>
+          </div>
         </DrawerContent>
       </Drawer>
 

@@ -34,7 +34,7 @@ export default async function RepoPage({
         <Header
           backHref="/repos"
           backLabel="Repositories"
-          title={"Repositories"}
+          title={'Repositories'}
           subtitle={''}
           actions={
             <BranchSwitcher
