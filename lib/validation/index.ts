@@ -1,8 +1,13 @@
 /**
+ * lib\validation\index.ts
  * All validation is server-side and defensive. Nothing from the client is
  * trusted: repo names, branch names, file paths, and commit messages are
  * re-validated on every server action, even if the UI already restricts
  * input.
+ *
+ * Every exported validator accepts `unknown` and narrows internally —
+ * callers may pass undefined/null/non-strings (e.g. a missing route param)
+ * and get `false` back, never a thrown TypeError.
  */
 
 const OWNER_REPO_RE = /^[A-Za-z0-9](?:[A-Za-z0-9._-]{0,98})$/;
@@ -40,7 +45,8 @@ const LIKELY_BINARY_EXTENSIONS = new Set([
   'db', 'sqlite', 'sqlite3',
 ]);
 
-export function isLikelyBinaryPath(path: string): boolean {
+export function isLikelyBinaryPath(path: unknown): boolean {
+  if (typeof path !== 'string' || path.length === 0) return false;
   const name = path.split('/').pop() ?? '';
   const dot = name.lastIndexOf('.');
   if (dot === -1 || dot === name.length - 1) return false; // no extension, or dotfile like .gitignore
@@ -48,11 +54,13 @@ export function isLikelyBinaryPath(path: string): boolean {
   return LIKELY_BINARY_EXTENSIONS.has(ext);
 }
 
-export function isValidOwnerOrRepo(value: string): boolean {
+export function isValidOwnerOrRepo(value: unknown): value is string {
+  if (typeof value !== 'string' || value.length === 0) return false;
   return OWNER_REPO_RE.test(value) && !value.includes('..');
 }
 
-export function isValidBranchName(value: string): boolean {
+export function isValidBranchName(value: unknown): value is string {
+  if (typeof value !== 'string' || value.length === 0) return false;
   if (!BRANCH_RE.test(value)) return false;
   if (value.includes('..')) return false;
   if (value.startsWith('/') || value.endsWith('/')) return false;
@@ -65,8 +73,8 @@ export function isValidBranchName(value: string): boolean {
  * characters. Only relative, forward-slash paths within the repo tree are
  * accepted.
  */
-export function isValidRepoPath(value: string): boolean {
-  if (!value || value.length > 1024) return false;
+export function isValidRepoPath(value: unknown): value is string {
+  if (typeof value !== 'string' || value.length === 0 || value.length > 1024) return false;
   if (value.startsWith('/')) return false;
   if (value.includes('\\')) return false;
   if (value.includes('..')) return false;
@@ -76,7 +84,8 @@ export function isValidRepoPath(value: string): boolean {
   return segments.every((s) => s.length > 0 && s !== '.' && s !== '..');
 }
 
-export function isValidCommitMessage(value: string): boolean {
+export function isValidCommitMessage(value: unknown): value is string {
+  if (typeof value !== 'string') return false;
   const trimmed = value.trim();
   if (trimmed.length === 0) return false;
   if (trimmed.length > 500) return false;
@@ -85,6 +94,7 @@ export function isValidCommitMessage(value: string): boolean {
   return true;
 }
 
-export function isValidSha(value: string): boolean {
+export function isValidSha(value: unknown): value is string {
+  if (typeof value !== 'string') return false;
   return /^[a-f0-9]{40}$/i.test(value);
 }

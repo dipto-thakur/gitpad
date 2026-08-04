@@ -26,6 +26,9 @@ export function EditorActionsMenu({
   const [renameOpen, setRenameOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
+  const fileName = path.split('/').pop() ?? path;
+  const dirPath = path.includes('/') ? path.slice(0, path.lastIndexOf('/')) : null;
+
   return (
     <>
       <Drawer open={menuOpen} onOpenChange={setMenuOpen}>
@@ -39,13 +42,21 @@ export function EditorActionsMenu({
           <MoreVertical className="h-[18px] w-[18px]" />
         </Button>
         <DrawerContent open={menuOpen}>
-          <DrawerHeader>
-            <DrawerTitle>{path}</DrawerTitle>
+          <DrawerHeader className="gap-1">
+            <DrawerTitle className="truncate font-mono text-[15px] font-medium tracking-tight">
+              {fileName}
+            </DrawerTitle>
+            {dirPath && (
+              <p className="truncate text-[13px] text-zinc-400 dark:text-zinc-500">
+                {dirPath}
+              </p>
+            )}
           </DrawerHeader>
-          <ul className="pb-2">
+
+          <ul className="flex flex-col gap-0.5 px-1 pb-3 pt-1">
             <li>
               <Row
-                icon={<Pencil />}
+                icon={<Pencil className="h-[17px] w-[17px]" />}
                 label="Rename"
                 onClick={() => {
                   setMenuOpen(false);
@@ -53,9 +64,12 @@ export function EditorActionsMenu({
                 }}
               />
             </li>
+
+            <li className="my-1 h-px bg-zinc-100 dark:bg-zinc-800" role="separator" />
+
             <li>
               <Row
-                icon={<Trash2 />}
+                icon={<Trash2 className="h-[17px] w-[17px]" />}
                 label="Delete file"
                 destructive
                 onClick={() => {

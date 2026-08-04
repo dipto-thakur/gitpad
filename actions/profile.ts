@@ -5,9 +5,17 @@ import { getServerAccessToken } from '@/lib/auth/session';
 import { GitHubClient } from '@/lib/github/client';
 import type { ActionResult } from '@/types';
 
+export interface DayCount {
+  /** ISO date, e.g. "2026-08-05" */
+  date: string;
+  count: number;
+}
+
 export interface ProfileStats {
   totalContributions: number;
   currentStreak: number;
+  /** Oldest → newest, always exactly 7 entries ending today. */
+  last7Days: DayCount[];
 }
 
 /**

@@ -9,15 +9,15 @@ export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive' | 
 export type ButtonSize = 'default' | 'sm' | 'icon';
 
 const baseClasses =
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-40';
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-40';
 
 const variantClasses: Record<ButtonVariant, string> = {
   // One primary action per screen — this is that action.
-  primary: 'bg-accent text-accent-foreground hover:opacity-90',
-  secondary: 'bg-surface text-foreground border border-border hover:bg-muted',
-  ghost: 'text-foreground hover:bg-muted',
-  destructive: 'bg-destructive text-destructive-foreground hover:opacity-90',
-  link: 'text-muted-foreground hover:text-foreground underline-offset-4 hover:underline p-0 h-auto',
+  primary: 'bg-accent text-accent-foreground hover:opacity-90 active:opacity-80',
+  secondary: 'bg-surface text-foreground border border-border hover:bg-muted active:bg-muted/80',
+  ghost: 'text-foreground hover:bg-muted active:bg-muted/80',
+  destructive: 'bg-destructive text-destructive-foreground hover:opacity-90 active:opacity-80',
+  link: 'text-muted-foreground hover:text-foreground underline-offset-4 hover:underline h-auto p-0',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
@@ -35,7 +35,6 @@ export interface ButtonProps
   variant?: ButtonVariant;
   size?: ButtonSize;
 }
-
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'default', disabled, ...props }, ref) => (
     <motion.button
@@ -43,7 +42,12 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       whileTap={disabled ? undefined : { scale: 0.97 }}
       transition={{ duration: 0.12 }}
       disabled={disabled}
-      className={cn(baseClasses, variantClasses[variant], sizeClasses[size], className)}
+      className={cn(
+        baseClasses,
+        variantClasses[variant],
+        variant !== 'link' && sizeClasses[size],
+        className,
+      )}
       {...props}
     />
   ),

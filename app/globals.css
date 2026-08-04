@@ -60,6 +60,12 @@
   .pb-safe {
     padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
   }
+  /* Same idea, top+bottom — for screens (like sign-in) that vertically
+     center content edge-to-edge rather than anchoring a bottom bar. */
+  .py-safe {
+    padding-top: max(1.5rem, env(safe-area-inset-top));
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

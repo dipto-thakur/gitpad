@@ -10,6 +10,7 @@ import { CreateEntryForm } from '@/components/CreateEntryForm';
 import { Row, RowLink } from '@/components/ui/row';
 import { Skeleton } from '@/components/ui/skeleton';
 import { InlineBanner } from '@/components/ui/inline-banner';
+import { Divider } from '@/components/ui/divider';
 
 export function FileBrowser({
   owner,
@@ -55,6 +56,7 @@ export function FileBrowser({
   return (
     <div className={depth === 0 ? '' : 'ml-3 border-l border-border pl-1'}>
       <CreateEntryForm owner={owner} repo={repo} branch={branch} basePath={path} onCreated={() => setReloadToken((t) => t + 1)} />
+      <Divider className="mb-4" />
 
       {error && (
         <div className="px-3 py-2">

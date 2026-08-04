@@ -124,7 +124,11 @@ export class GitHubClient {
    * streak, for the profile drawer. Purely informational — callers should
    * treat failures here as non-fatal (see actions/profile.ts).
    */
-  async getContributionStats(): Promise<{ totalContributions: number; currentStreak: number }> {
+ async getContributionStats(): Promise<{
+    totalContributions: number;
+    currentStreak: number;
+    last7Days: { date: string; count: number }[];
+  }> {
     const query = `
       query {
         viewer {
@@ -145,12 +149,16 @@ export class GitHubClient {
     const data = await this.graphqlRequest<GhContributionsData>(query);
     const calendar = data.viewer.contributionsCollection.contributionCalendar;
     const days = calendar.weeks.flatMap((w) => w.contributionDays);
+    const last7Days = days.slice(-7).map((d) => ({
+      date: d.date,
+      count: d.contributionCount,
+    }));
     return {
       totalContributions: calendar.totalContributions,
       currentStreak: computeCurrentStreak(days),
+      last7Days,
     };
   }
-
   async listRepositories(): Promise<RepoSummary[]> {
     const repos = await this.request<GhRepo[]>(
       '/user/repos?per_page=100&sort=updated&affiliation=owner,collaborator,organization_member',
