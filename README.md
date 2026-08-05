@@ -23,12 +23,12 @@ GitHub REST API via Server Actions. No Firebase/Supabase/Clerk.
 ## Setup
 
 1. Create a GitHub OAuth App: https://github.com/settings/developers
-   - Homepage URL: `http://localhost:3000`
-   - Callback URL: `http://localhost:3000/api/auth/callback/github`
+   - Homepage URL: `https://gitnote.vercel.app:3000`
+   - Callback URL: `https://gitnote.vercel.app:3000/api/auth/callback/github`
 2. Copy `.env.example` to `.env.local` and fill in:
    - `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` from the OAuth App
    - `NEXTAUTH_SECRET` — generate with `openssl rand -base64 32`
-   - `NEXTAUTH_URL=http://localhost:3000`
+   - `NEXTAUTH_URL=https://gitnote.vercel.app:3000`
 3. Install and run:
    ```
    npm install

@@ -21,7 +21,7 @@ const SCOPES = ['read:user', 'repo'];
 
 // Whether to use the __Secure- cookie prefix should track whether the app
 // is actually served over https, not NODE_ENV — `next start` always sets
-// NODE_ENV=production even when running on plain http://localhost (e.g.
+// NODE_ENV=production even when running on plain https://gitnote.vercel.app (e.g.
 // testing a production build locally), which would otherwise make the
 // session cookie unsettable and silently break auth.
 const useSecureCookies = (process.env.NEXTAUTH_URL ?? '').startsWith('https://');

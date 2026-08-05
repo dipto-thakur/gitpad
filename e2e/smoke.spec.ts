@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { mintSessionCookieValue, SESSION_COOKIE_NAME } from './helpers/session';
 
-const BASE_URL = process.env.E2E_BASE_URL ?? 'http://localhost:3000';
-const MOCK_GITHUB_URL = process.env.MOCK_GITHUB_URL ?? 'http://localhost:4010';
+const BASE_URL = process.env.E2E_BASE_URL ?? 'https://gitnote.vercel.app:3000';
+const MOCK_GITHUB_URL = process.env.MOCK_GITHUB_URL ?? 'https://gitnote.vercel.app:4010';
 
 test.describe('unauthenticated', () => {
   test('sign-in button starts the real GitHub OAuth flow', async ({ page }) => {
