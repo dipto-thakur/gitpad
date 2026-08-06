@@ -1,7 +1,7 @@
 // file: components/CreateEntryForm.tsx
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FilePlus, FolderPlus } from 'lucide-react';
 import { createFileAction } from '@/actions/github';
@@ -11,34 +11,53 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { InlineBanner } from '@/components/ui/inline-banner';
 
+type EntryMode = 'file' | 'folder';
+
 export function CreateEntryForm({
   owner,
   repo,
   branch,
   basePath,
   onCreated,
+  openMode,
+  onOpenModeChange,
 }: {
   owner: string;
   repo: string;
   branch: string;
   basePath: string;
   onCreated: () => void;
+  openMode?: EntryMode | null;
+  onOpenModeChange?: (mode: EntryMode | null) => void;
 }) {
-  const [mode, setMode] = useState<'file' | 'folder' | null>(null);
+  const [internalMode, setInternalMode] = useState<EntryMode | null>(null);
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState<'idle' | 'creating' | 'error'>('idle');
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  function close(open: boolean) {
-    if (!open) {
-      if (status === 'creating') return;
-      setMode(null);
+  const controlled = openMode !== undefined;
+  const mode = controlled ? openMode : internalMode;
+
+  function setMode(next: EntryMode | null) {
+    if (controlled) onOpenModeChange?.(next);
+    else setInternalMode(next);
+  }
+
+  useEffect(() => {
+    if (mode === null) {
       setName('');
       setMessage('');
       setError(null);
       setStatus('idle');
+    }
+  }, [mode]);
+
+  function close(open: boolean) {
+    if (!open) {
+      if (status === 'creating') return;
+      setMode(null);
     }
   }
 
@@ -47,8 +66,6 @@ export function CreateEntryForm({
     const trimmed = name.trim();
     if (!trimmed) return;
 
-    // GitHub has no real empty-folder concept — create a placeholder file,
-    // same as git's own .gitkeep convention.
     const path =
       mode === 'folder' ? [basePath, trimmed, '.gitkeep'].filter(Boolean).join('/') : [basePath, trimmed].filter(Boolean).join('/');
 
@@ -77,32 +94,41 @@ export function CreateEntryForm({
 
   return (
     <>
-      <div className="flex">
-        <Row icon={<FilePlus />} label="New file" onClick={() => setMode('file')} className="flex-1" />
-        <Row icon={<FolderPlus />} label="New folder" onClick={() => setMode('folder')} className="flex-1" />
-      </div>
+      {!controlled && (
+        <div className="flex gap-2">
+          <Row icon={<FilePlus />} label="New file" onClick={() => setMode('file')} className="flex-1" />
+          <Row icon={<FolderPlus />} label="New folder" onClick={() => setMode('folder')} className="flex-1" />
+        </div>
+      )}
 
-      <Drawer open={mode !== null} onOpenChange={close}>
-        <DrawerContent open={mode !== null}>
+      <Drawer open={mode != null} onOpenChange={close}>
+        <DrawerContent open={mode != null}>
           <form onSubmit={handleSubmit}>
             <DrawerHeader>
-              <DrawerTitle>{mode === 'folder' ? 'New folder' : 'New file'}</DrawerTitle>
+              <DrawerTitle className="font-mono text-[15px] font-medium tracking-tight">
+                {mode === 'folder' ? 'New folder' : 'New file'}
+              </DrawerTitle>
             </DrawerHeader>
+
             <DrawerBody className="flex flex-col gap-3">
               <Input
                 autoFocus
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder={mode === 'folder' ? 'folder-name' : 'e.g. notes.md, app.py, index.html'}
+                className="font-mono text-[13.5px]"
+                aria-label={mode === 'folder' ? 'Folder name' : 'File name'}
               />
               <Input
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Commit message (optional)"
                 maxLength={500}
+                aria-label="Commit message"
               />
               {status === 'error' && error && <InlineBanner variant="error">{error}</InlineBanner>}
             </DrawerBody>
+
             <DrawerFooter>
               <Button type="button" variant="ghost" onClick={() => close(false)} disabled={status === 'creating'}>
                 Cancel

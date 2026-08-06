@@ -20,14 +20,22 @@ export function Hero() {
   };
 
   return (
-    <section className="mx-auto max-w-5xl px-6 py-16 sm:py-24">
+    <section className="mx-auto max-w-5xl px-6 pb-16 pt-10 sm:py-24">
       <motion.div
         initial="hidden"
         animate="show"
         variants={container}
-        className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16"
+        className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16"
       >
-        <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+        {/* Mobile: preview surfaces first so the product is felt before it's
+            explained — copy + CTA follow directly under it, both above the
+            fold on a typical phone. Desktop: reverts to text-left,
+            preview-right, unchanged from before. */}
+        <motion.div variants={item} className="order-1 flex justify-center lg:order-2 lg:justify-end">
+          <EditorPreview />
+        </motion.div>
+
+        <div className="order-2 flex flex-col items-center text-center lg:order-1 lg:items-start lg:text-left">
           <motion.h1 variants={item} className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
             {SITE_CONFIG.tagline}
           </motion.h1>
@@ -41,10 +49,6 @@ export function Hero() {
             <SignInButton className="w-full sm:w-auto sm:px-8" />
           </motion.div>
         </div>
-
-        <motion.div variants={item} className="flex justify-center lg:justify-end">
-          <EditorPreview />
-        </motion.div>
       </motion.div>
     </section>
   );

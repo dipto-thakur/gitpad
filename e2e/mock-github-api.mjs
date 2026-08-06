@@ -21,7 +21,7 @@ function toBase64(text) {
 }
 
 const server = http.createServer((req, res) => {
-  const url = new URL(req.url ?? '/', `https://gitnote.vercel.app:${PORT}`);
+  const url = new URL(req.url ?? '/', `http://localhost:${PORT}`);
   const path = url.pathname;
 
   // Test-only reset hook so each spec starts from known state.
@@ -103,5 +103,5 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
   // eslint-disable-next-line no-console
-  console.log(`mock GitHub API listening on https://gitnote.vercel.app:${PORT}`);
+  console.log(`mock GitHub API listening on http://localhost:${PORT}`);
 });

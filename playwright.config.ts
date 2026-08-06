@@ -9,7 +9,7 @@ export default defineConfig({
   fullyParallel: false, // shared mock-server state; keep specs sequential
   retries: 0,
   use: {
-    baseURL: `https://gitnote.vercel.app:${PORT}`,
+    baseURL: `http://localhost:${PORT}`,
     trace: 'retain-on-failure',
   },
   webServer: [
@@ -28,8 +28,8 @@ export default defineConfig({
         GITHUB_CLIENT_ID: 'test-client-id',
         GITHUB_CLIENT_SECRET: 'test-client-secret',
         NEXTAUTH_SECRET: 'e2e-test-secret-e2e-test-secret',
-        NEXTAUTH_URL: `https://gitnote.vercel.app:${PORT}`,
-        GITHUB_API_BASE_URL: `https://gitnote.vercel.app:${MOCK_GITHUB_PORT}`,
+        NEXTAUTH_URL: `http://localhost:${PORT}`,
+        GITHUB_API_BASE_URL: `http://localhost:${MOCK_GITHUB_PORT}`,
       },
     },
   ],
