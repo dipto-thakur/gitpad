@@ -3,8 +3,8 @@
 
 import { motion, type Variants } from 'framer-motion';
 import { SignInButton } from '@/components/sign/SignInButton';
-import { EditorPreview } from '@/components/landing/EditorPreview';
-import { SITE_CONFIG } from '@/components/landing/site-config';
+import { EditorPreview } from '@/components/landing/illustration';
+import { siteConfig } from '@/hooks/site-config';
 import { useSafeReducedMotion } from '@/lib/use-safe-reduced-motion';
 
 export function Hero() {
@@ -37,10 +37,10 @@ export function Hero() {
 
         <div className="order-2 flex flex-col items-center text-center lg:order-1 lg:items-start lg:text-left">
           <motion.h1 variants={item} className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-            {SITE_CONFIG.tagline}
+            {siteConfig.tagline}
           </motion.h1>
           <motion.p variants={item} className="mt-4 max-w-sm text-sm leading-6 text-muted-foreground sm:text-base">
-            A lightweight GitHub document client. Open a file, edit it, commit —
+            A lightweight GitHub document client. Open a file, edit it, commit.
             no Git, no terminal, no local clone.
           </motion.p>
 

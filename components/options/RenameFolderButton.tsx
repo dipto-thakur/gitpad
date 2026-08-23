@@ -1,27 +1,27 @@
-// file: components/RenameFileButton.tsx
+// file: components/RenameFolderButton.tsx
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Info } from 'lucide-react';
-import { renameFileAction } from '@/actions/github';
+import { renameFolderAction } from '@/actions/github';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerBody, DrawerFooter } from '@/components/ui/drawer';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { InlineBanner } from '@/components/ui/inline-banner';
 
 /**
- * Controlled — opened from EditorActionsMenu, same reasoning as
- * DeleteFileButton: one visible primary action (Commit) on the editor
- * screen, secondary actions live behind "More".
+ * Controlled, mirrors RenameFileButton but operates on every file under
+ * `path` via renameFolderAction. Calls onRenamed() to refresh the listing
+ * — no single edit route to navigate to for a folder.
  */
-export function RenameFileButton({
+export function RenameFolderButton({
   owner,
   repo,
   branch,
   path,
   open,
   onOpenChange,
+  onRenamed,
 }: {
   owner: string;
   repo: string;
@@ -29,14 +29,14 @@ export function RenameFileButton({
   path: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onRenamed: () => void;
 }) {
   const [newPath, setNewPath] = useState(path);
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState<'idle' | 'renaming' | 'error'>('idle');
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
 
-  const fileName = path.split('/').pop() ?? path;
+  const folderName = path.split('/').pop() ?? path;
   const trimmedNew = newPath.trim();
 
   function close(next: boolean) {
@@ -55,7 +55,7 @@ export function RenameFileButton({
     if (!trimmedNew || trimmedNew === path) return;
     setStatus('renaming');
     setError(null);
-    const result = await renameFileAction({
+    const result = await renameFolderAction({
       owner,
       repo,
       branch,
@@ -68,7 +68,8 @@ export function RenameFileButton({
       setError(result.error);
       return;
     }
-    router.push(`/repos/${owner}/${repo}/edit/${trimmedNew}?branch=${encodeURIComponent(branch)}`);
+    onRenamed();
+    close(false);
   }
 
   return (
@@ -77,10 +78,10 @@ export function RenameFileButton({
         <form onSubmit={handleRename}>
           <DrawerHeader className="gap-1">
             <DrawerTitle className="truncate font-mono text-[15px] font-medium tracking-tight">
-              Rename {fileName}
+              Rename {folderName}/
             </DrawerTitle>
             <DrawerDescription className="text-[13px] text-zinc-400 dark:text-zinc-500">
-              Two commits to <strong className="font-medium text-zinc-600 dark:text-zinc-300">{branch}</strong> — create at the new path, then remove the old one.
+              One create + delete commit pair per file inside, to <strong className="font-medium text-zinc-600 dark:text-zinc-300">{branch}</strong>.
             </DrawerDescription>
           </DrawerHeader>
 
@@ -88,7 +89,7 @@ export function RenameFileButton({
             <div className="flex items-start gap-2.5 rounded-xl border border-zinc-200/80 bg-zinc-100/60 px-3.5 py-3 dark:border-zinc-800/80 dark:bg-zinc-900/60">
               <Info className="mt-0.5 h-4 w-4 shrink-0 text-zinc-400 dark:text-zinc-500" strokeWidth={2} />
               <p className="text-[13px] leading-snug text-zinc-500 dark:text-zinc-400">
-                The old file is only removed once the new one is created successfully.
+                Large folders take longer — each file is moved individually. Don't close this until it finishes.
               </p>
             </div>
 

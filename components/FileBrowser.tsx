@@ -1,13 +1,16 @@
 // file: components/FileBrowser.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Folder, FileText, FolderOpen, FilePlus, FolderPlus } from 'lucide-react';
+import { useState } from 'react';
+import { FilePlus, FolderOpen, FolderPlus } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { listTreeAction } from '@/actions/github';
-import type { TreeEntry } from '@/types';
+
+import { useFileTree } from '@/hooks/useFileTree';
+import { useOpenDirs } from '@/hooks/useOpenDirs';
+import { EntryRow } from '@/components/FileBrowser/EntryRow';
 import { CreateEntryForm } from '@/components/CreateEntryForm';
-import { Row, RowLink, StaticRow } from '@/components/ui/row';
+
+import { StaticRow } from '@/components/ui/row';
 import { Skeleton } from '@/components/ui/skeleton';
 import { InlineBanner } from '@/components/ui/inline-banner';
 import { Divider } from '@/components/ui/divider';
@@ -19,60 +22,42 @@ export function FileBrowser({
   branch,
   path,
   depth = 0,
+  openDirs: openDirsProp,
+  onToggleDir: onToggleDirProp,
 }: {
   owner: string;
   repo: string;
   branch: string;
   path: string;
   depth?: number;
+  openDirs?: Set<string>;
+  onToggleDir?: (path: string) => void;
 }) {
-  const [entries, setEntries] = useState<TreeEntry[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [openDirs, setOpenDirs] = useState<Set<string>>(new Set());
-  const [reloadToken, setReloadToken] = useState(0);
+  const { entries, error, reload, isEmpty } = useFileTree(owner, repo, branch, path);
   const [createMode, setCreateMode] = useState<'file' | 'folder' | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    setEntries(null);
-    setError(null);
-    listTreeAction(owner, repo, branch, path).then((res) => {
-      if (cancelled) return;
-      if (res.ok) setEntries(res.data);
-      else setError(res.error);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [owner, repo, branch, path, reloadToken]);
-
-  function toggleDir(p: string) {
-    setOpenDirs((prev) => {
-      const next = new Set(prev);
-      if (next.has(p)) next.delete(p);
-      else next.add(p);
-      return next;
-    });
-  }
-
-  const isEmpty = !error && entries !== null && entries.length === 0;
+  // Root owns the URL-backed open state; nested recursive calls receive it
+  // as props instead of each level reading/writing the URL independently.
+  const ownOpenDirs = useOpenDirs();
+  const openDirs = openDirsProp ?? ownOpenDirs.openDirs;
+  const toggleDir = onToggleDirProp ?? ownOpenDirs.toggleDir;
 
   return (
     <div className={depth === 0 ? '' : 'ml-3 border-l border-zinc-200/80 pl-3 dark:border-zinc-800/80'}>
       {depth === 0 && (
-  <>
-    <CreateEntryForm
-      owner={owner}
-      repo={repo}
-      branch={branch}
-      basePath={path}
-      onCreated={() => setReloadToken((t) => t + 1)}
-      openMode={createMode}
-      onOpenModeChange={setCreateMode}
-    />
-    <Divider className="mb-4" />
-  </>
-)}
+        <>
+          <CreateEntryForm
+            owner={owner}
+            repo={repo}
+            branch={branch}
+            basePath={path}
+            onCreated={reload}
+            openMode={createMode}
+            onOpenModeChange={setCreateMode}
+          />
+          <Divider className="mb-4" />
+        </>
+      )}
 
       {error && (
         <div className="px-1 py-2">
@@ -88,34 +73,44 @@ export function FileBrowser({
         </div>
       )}
 
-{isEmpty && depth === 0 && (
-  <EmptyState
-    icon={<FolderOpen />}
-    title="This folder is empty"
-    description="Create a file or folder to get started."
-    primaryAction={{ label: 'New file', icon: <FilePlus />, onClick: () => setCreateMode('file') }}
-    secondaryAction={{ label: 'New folder', icon: <FolderPlus />, onClick: () => setCreateMode('folder') }}
-  />
-)}
+      {isEmpty && depth === 0 && (
+        <EmptyState
+          icon={<FolderOpen />}
+          title="This folder is empty"
+          description="Create a file or folder to get started."
+          primaryAction={{ label: 'New file', icon: <FilePlus />, onClick: () => setCreateMode('file') }}
+          secondaryAction={{ label: 'New folder', icon: <FolderPlus />, onClick: () => setCreateMode('folder') }}
+        />
+      )}
 
       {isEmpty && depth > 0 && (
-        <StaticRow icon={<FolderOpen />} label="Empty folder" className="text-zinc-400 dark:text-zinc-600" />
+        <StaticRow
+          icon={<FolderOpen />}
+          label="Empty folder"
+          meta="Use ⋯ on the folder above to add files"
+          className="text-zinc-400 dark:text-zinc-600"
+        />
       )}
 
       {!error && entries !== null && entries.length > 0 && (
         <ul className="flex flex-col gap-0.5">
-          {entries.map((entry) => (
-            <li key={entry.path}>
-              {entry.type === 'dir' ? (
-                <>
-                  <Row
-                    icon={<Folder />}
-                    label={`${entry.name}/`}
-                    onClick={() => toggleDir(entry.path)}
-                    aria-expanded={openDirs.has(entry.path)}
-                  />
+          {entries.map((entry) => {
+            const isOpen = openDirs.has(entry.path);
+            return (
+              <li key={entry.path}>
+                <EntryRow
+                  owner={owner}
+                  repo={repo}
+                  branch={branch}
+                  entry={entry}
+                  isOpen={isOpen}
+                  onToggleDir={toggleDir}
+                  onChanged={reload}
+                />
+
+                {entry.type === 'dir' && (
                   <AnimatePresence initial={false}>
-                    {openDirs.has(entry.path) && (
+                    {isOpen && (
                       <motion.div
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
@@ -124,29 +119,23 @@ export function FileBrowser({
                         className="overflow-hidden"
                       >
                         <div className="pt-0.5">
-                          <FileBrowser owner={owner} repo={repo} branch={branch} path={entry.path} depth={depth + 1} />
+                          <FileBrowser
+                            owner={owner}
+                            repo={repo}
+                            branch={branch}
+                            path={entry.path}
+                            depth={depth + 1}
+                            openDirs={openDirs}
+                            onToggleDir={toggleDir}
+                          />
                         </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </>
-              ) : entry.supported ? (
-                <RowLink
-                  href={`/repos/${owner}/${repo}/edit/${entry.path}?branch=${encodeURIComponent(branch)}`}
-                  icon={<FileText />}
-                  label={entry.name}
-                />
-              ) : (
-                <RowLink
-                  href={`/repos/${owner}/${repo}/edit/${entry.path}?branch=${encodeURIComponent(branch)}`}
-                  icon={<FileText />}
-                  label={entry.name}
-                  meta="likely binary"
-                  className="text-zinc-400 dark:text-zinc-600"
-                />
-              )}
-            </li>
-          ))}
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

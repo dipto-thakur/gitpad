@@ -6,8 +6,8 @@ import { MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { Row } from '@/components/ui/row';
 import { Button } from '@/components/ui/button';
-import { DeleteFileButton } from '@/components/DeleteFileButton';
-import { RenameFileButton } from '@/components/RenameFileButton';
+import { DeleteFileButton } from '@/components/options/DeleteFileButton';
+import { RenameFileButton } from '@/components/options/RenameFileButton';
 
 export function EditorActionsMenu({
   owner,
@@ -82,7 +82,16 @@ export function EditorActionsMenu({
       </Drawer>
 
       <RenameFileButton owner={owner} repo={repo} branch={branch} path={path} open={renameOpen} onOpenChange={setRenameOpen} />
-      <DeleteFileButton owner={owner} repo={repo} branch={branch} path={path} sha={sha} open={deleteOpen} onOpenChange={setDeleteOpen} />
+      <DeleteFileButton
+  owner={owner}
+  repo={repo}
+  branch={branch}
+  path={path}
+  sha={sha}
+  open={deleteOpen}
+  onOpenChange={setDeleteOpen}
+  redirectAfterDelete
+/>
     </>
   );
 }

@@ -8,6 +8,8 @@ import { RepoSearch } from "@/components/RepoSearch";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { InlineBanner } from "@/components/ui/inline-banner";
 import { Header } from "@/components/ui/header";
+import { Footer } from '@/components/landing/Footer';
+import { BrandMark } from '@/components/icons/BrandMark';
 
 export default async function ReposPage() {
   const user = await getCurrentUser();
@@ -16,24 +18,20 @@ export default async function ReposPage() {
   return (
     <main className="min-h-dvh bg-zinc-50 dark:bg-zinc-950">
       <div className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col">
-        <Header
-          title="GitNote"
-          mono={false}
-          actions={
-            <>
-              <ThemeToggle />
-              {user && (
-                <Profile login={user.login} name={user.name} image={user.image} />
-              )}
-            </>
-          }
-        />
+      <Header actions={user && <Profile login={user.login} name={user.name} image={user.image} />} />
 
-        <section className="flex-1 px-4 pb-10 pt-6 sm:px-10 sm:pt-10">
-          {!result.ok && <InlineBanner variant="error">{result.error}</InlineBanner>}
+
+        <section className="flex-1   px-3 pb-6 pt-4 sm:px-10 sm:pb-10 sm:pt-10">
+          {!result.ok && (
+            <InlineBanner variant="error">{result.error}</InlineBanner>
+          )}
 
           {result.ok && <RepoSearch repos={result.data} />}
         </section>
+      </div>
+
+      <div className="hidden sm:block">
+        <Footer />
       </div>
     </main>
   );

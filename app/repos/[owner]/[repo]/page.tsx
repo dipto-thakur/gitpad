@@ -1,9 +1,13 @@
 // file: app/repos/[owner]/[repo]/page.tsx
+import Link from 'next/link';
+import { RiAlertLine, RiArrowLeftSLine } from 'react-icons/ri';
 import { getRepoAction, listBranchesAction } from '@/actions/github';
+import { Directory } from '@/components/ui/directory';
 import { FileBrowser } from '@/components/FileBrowser';
 import { BranchSwitcher } from '@/components/BranchSwitcher';
 import { InlineBanner } from '@/components/ui/inline-banner';
 import { Header } from '@/components/ui/header';
+import { Footer } from '@/components/landing/Footer';
 
 export default async function RepoPage({
   params,
@@ -32,35 +36,33 @@ export default async function RepoPage({
   return (
     <main className="min-h-dvh bg-zinc-50 dark:bg-zinc-950">
       <div className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col">
-        <Header
-          backHref="/repos"
-          backLabel="Repositories"
-          title={repoResult.data.name}
-          subtitle={owner}
-          actions={
-            <BranchSwitcher
-              owner={owner}
-              repo={repo}
-              branches={branchesResult.data}
-              activeBranch={branch}
-            />
-          }
-        />
+        <Header />
 
-        <section className="flex-1 px-4 pb-10 pt-6 sm:px-10 sm:pt-10">
-          <div className="mb-6 sm:mb-8">
-            <h1 className="truncate font-mono text-[19px] font-medium tracking-tight text-zinc-800 dark:text-zinc-200 sm:text-[22px]">
-              {repoResult.data.name}
-            </h1>
-            <p className="mt-1 truncate text-[13px] text-zinc-400 dark:text-zinc-500">
-              {owner} · {branch}
-            </p>
+        <section className="min-w-0 flex-1 px-3 pb-6 pt-3 sm:px-10 sm:pb-10 sm:pt-8">
+          <div className="mb-3 flex items-center justify-between gap-2 sm:mb-4">
+            <Link
+              href="/repos"
+              className="-ml-1.5 flex h-9 shrink-0 items-center gap-1 rounded-lg px-2 text-[13px] font-medium text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-900 active:bg-zinc-100 dark:text-zinc-500 dark:hover:bg-zinc-900 dark:hover:text-zinc-100 dark:active:bg-zinc-900"
+            >
+              <RiArrowLeftSLine className="h-[18px] w-[18px] shrink-0" />
+              <span className="sm:inline">Repositories</span>
+            </Link>
+
+            <BranchSwitcher owner={owner} repo={repo} branches={branchesResult.data} activeBranch={branch} />
           </div>
 
-          <div className="rounded-xl border border-zinc-200/80 bg-zinc-100/60 p-2 dark:border-zinc-800/80 dark:bg-zinc-900/60 sm:p-3">
+          <div className="mb-3 min-w-0 px-0.5 sm:mb-5">
+            <Directory owner={owner} repo={repoResult.data.name}/>
+          </div>
+
+          <div className="min-w-0 overflow-hidden rounded-xl border border-zinc-200/80 bg-zinc-100/40 p-1 dark:border-zinc-800/80 dark:bg-zinc-900/40 sm:p-2.5">
             <FileBrowser owner={owner} repo={repo} branch={branch} path="" />
           </div>
         </section>
+      </div>
+
+      <div className="hidden sm:block">
+        <Footer />
       </div>
     </main>
   );
@@ -69,10 +71,27 @@ export default async function RepoPage({
 function ErrorState({ message }: { message: string }) {
   return (
     <main className="min-h-dvh bg-zinc-50 dark:bg-zinc-950">
-      <div className="mx-auto w-full max-w-5xl">
-        <Header backHref="/repos" backLabel="Repositories" title="Error" mono={false} />
-        <div className="px-4 py-10 sm:px-10">
-          <InlineBanner variant="error">{message}</InlineBanner>
+      <div className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col">
+        <Header />
+
+        <div className="flex flex-1 items-center justify-center px-4">
+          <div className="w-full max-w-sm">
+            <div className="mb-4 flex justify-center">
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900">
+                <RiAlertLine className="h-5 w-5 text-red-500/90 dark:text-red-400/80" />
+              </div>
+            </div>
+
+            <InlineBanner variant="error">{message}</InlineBanner>
+
+            <Link
+              href="/repos"
+              className="mt-4 flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-[13.5px] font-medium text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800 active:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-100 dark:active:bg-zinc-900"
+            >
+              <RiArrowLeftSLine className="h-4 w-4" />
+              Back to repositories
+            </Link>
+          </div>
         </div>
       </div>
     </main>

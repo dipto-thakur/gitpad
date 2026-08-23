@@ -5,7 +5,7 @@ import { Nav } from '@/components/landing/Nav';
 import { Hero } from '@/components/landing/Hero';
 import { HowItWorks } from '@/components/landing/HowItWorks';
 import { About } from '@/components/landing/About';
-import { Creator } from '@/components/landing/Creator';
+import { Footer } from '@/components/landing/Footer';
 
 export default async function HomePage() {
   const user = await getCurrentUser();
@@ -20,7 +20,7 @@ export default async function HomePage() {
       <Hero />
       <HowItWorks />
       <About />
-      <Creator />
+      <Footer />
     </main>
   );
 }

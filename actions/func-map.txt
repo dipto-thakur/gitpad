@@ -1,0 +1,62 @@
+actions/github.ts
+        │
+        ├── repository.ts
+        │     ├── listRepositoriesAction
+        │     ├── listBranchesAction
+        │     └── getRepoAction
+        │
+        ├── tree.ts
+        │     └── listTreeAction
+        │
+        ├── file.ts
+        │     ├── getFileAction
+        │     ├── createFileAction
+        │     ├── commitFileAction
+        │     └── deleteFileAction
+        │
+        ├── rename.ts
+        │     ├── renameFileAction
+        │     └── renameFolderAction
+        │
+        └── shared.ts
+              ├── getClient
+              ├── fail
+              ├── fromApiError
+              └── apiErrorMessage
+
+actions/
+├── github.ts                    ← MAIN STATION / public exports
+│
+└── github/
+    ├── shared.ts                ← auth, client, fail, error handling
+    ├── repository.ts            ← repositories + branches + repo info
+    ├── tree.ts                  ← directory/file tree
+    ├── file.ts                  ← get/create/commit/delete file
+    ├── rename.ts                ← file + folder rename
+    └── folder.ts                ← folder-specific operations
+
+
+shared.ts
+├── getClient
+├── fail
+├── fromApiError
+├── apiErrorMessage
+└── validation helpers
+
+repository.ts
+├── listRepositoriesAction
+├── listBranchesAction
+└── getRepoAction
+
+tree.ts
+└── listTreeAction
+
+file.ts
+├── getFileAction
+├── createFileAction
+├── commitFileAction
+└── deleteFileAction
+
+rename.ts
+├── renameFileAction
+└── renameFolderAction
