@@ -51,7 +51,7 @@ function ErrorState({
   icon?: React.ReactNode;
 }) {
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-zinc-50 px-4 dark:bg-zinc-950">
+    <main className="flex min-h-dvh items-center justify-center bg-zinc-50 px-4 dark:bg-zinc-950/95">
       <div className="w-full max-w-sm">
         <div className="mb-4 flex justify-center">
           <div className="flex h-11 w-11 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900">

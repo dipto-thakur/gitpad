@@ -43,7 +43,7 @@ export function EntryRow({
     <div
       className={cn(
         'flex items-center gap-0.5',
-        !isLast && !isOpen && 'border-b border-zinc-200/60 dark:border-zinc-800/60',
+        !isLast && !isOpen && 'border-b  bg-zinc-50/95 dark:bg-zinc-950/95',
       )}
     >
       {isDir ? (

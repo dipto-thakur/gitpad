@@ -4,9 +4,11 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 
 import "./globals.css";
+import { BackgroundTexture } from "@/components/theme/background-texture";
 
 import { AuthProvider } from "@/components/AuthProvider";
 import { ThemeProvider } from "@/components/theme/theme-provider";
+import { ScrollbarStyles } from '@/components/ui/scrollbar';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -87,12 +89,15 @@ export default function RootLayout({
       className={inter.variable}
     >
       <body className="min-h-screen bg-background font-sans antialiased">
+
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
-        >
+        >      <ScrollbarStyles />
+   <BackgroundTexture />
+
           <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>
       </body>

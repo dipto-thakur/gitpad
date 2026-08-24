@@ -99,7 +99,7 @@ export function EntryOptionsMenu({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-        <Button
+          <Button
             type="button"
             variant="ghost"
             size="icon"
@@ -119,11 +119,11 @@ export function EntryOptionsMenu({
           {isDir && (
             <>
               <DropdownMenuItem onSelect={() => setCreateMode('file')}>
-                <FilePlus className="h-[15px] w-[15px] shrink-0 text-zinc-400 dark:text-zinc-500" strokeWidth={2} />
+                <FilePlus className="text-zinc-400 dark:text-zinc-500" strokeWidth={2} />
                 New file
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => setCreateMode('folder')}>
-                <FolderPlus className="h-[15px] w-[15px] shrink-0 text-zinc-400 dark:text-zinc-500" strokeWidth={2} />
+                <FolderPlus className="text-zinc-400 dark:text-zinc-500" strokeWidth={2} />
                 New folder
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -131,12 +131,12 @@ export function EntryOptionsMenu({
           )}
 
           <DropdownMenuItem onSelect={() => setRenameOpen(true)}>
-            <Pencil className="h-[15px] w-[15px] shrink-0 text-zinc-400 dark:text-zinc-500" strokeWidth={2} />
+            <Pencil className="text-zinc-400 dark:text-zinc-500" strokeWidth={2} />
             Rename
           </DropdownMenuItem>
 
           <DropdownMenuItem onSelect={copyPath}>
-            <Copy className="h-[15px] w-[15px] shrink-0 text-zinc-400 dark:text-zinc-500" strokeWidth={2} />
+            <Copy className="text-zinc-400 dark:text-zinc-500" strokeWidth={2} />
             {copied ? 'Copied!' : 'Copy path'}
           </DropdownMenuItem>
 
@@ -144,9 +144,9 @@ export function EntryOptionsMenu({
 
           <DropdownMenuItem onSelect={download} disabled={downloading}>
             {downloading ? (
-              <Loader2 className="h-[15px] w-[15px] shrink-0 animate-spin text-zinc-400 dark:text-zinc-500" strokeWidth={2} />
+              <Loader2 className="animate-spin text-zinc-400 dark:text-zinc-500" strokeWidth={2} />
             ) : (
-              <Download className="h-[15px] w-[15px] shrink-0 text-zinc-400 dark:text-zinc-500" strokeWidth={2} />
+              <Download className="text-zinc-400 dark:text-zinc-500" strokeWidth={2} />
             )}
             {isDir ? 'Download as .zip' : 'Download'}
           </DropdownMenuItem>
@@ -154,11 +154,8 @@ export function EntryOptionsMenu({
           {!isDir && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onSelect={() => setDeleteOpen(true)}
-                className="text-red-600 data-[highlighted]:bg-red-50 dark:text-red-400 dark:data-[highlighted]:bg-red-950/40"
-              >
-                <Trash2 className="h-[15px] w-[15px] shrink-0 text-red-500/80 dark:text-red-400/80" strokeWidth={2} />
+              <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
+                <Trash2 strokeWidth={2} />
                 Delete file
               </DropdownMenuItem>
             </>

@@ -34,7 +34,7 @@ export default async function RepoPage({
   const branch = isKnownBranch ? activeBranch : repoResult.data.defaultBranch;
 
   return (
-    <main className="min-h-dvh bg-zinc-50 dark:bg-zinc-950">
+    <main className="min-h-dvh bg-zinc-50 dark:bg-zinc-950/95">
       <div className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col">
         <Header />
 

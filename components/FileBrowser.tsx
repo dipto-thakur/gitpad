@@ -36,14 +36,13 @@ export function FileBrowser({
   const { entries, error, reload, isEmpty } = useFileTree(owner, repo, branch, path);
   const [createMode, setCreateMode] = useState<'file' | 'folder' | null>(null);
 
-  // Root owns the URL-backed open state; nested recursive calls receive it
-  // as props instead of each level reading/writing the URL independently.
+
   const ownOpenDirs = useOpenDirs();
   const openDirs = openDirsProp ?? ownOpenDirs.openDirs;
   const toggleDir = onToggleDirProp ?? ownOpenDirs.toggleDir;
 
   return (
-    <div className={depth === 0 ? '' : 'ml-3 border-l border-zinc-200/80 pl-3 dark:border-zinc-800/80'}>
+    <div className={depth === 0 ? '' : 'ml-3 border-l border-zinc-200 pl-3 dark:border-zinc-800 bg-zinc-50/90 dark:bg-zinc-950/90'}>
       {depth === 0 && (
         <>
           <CreateEntryForm
