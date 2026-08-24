@@ -9,7 +9,6 @@ import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { InlineBanner } from "@/components/ui/inline-banner";
 import { Header } from "@/components/ui/header";
 import { Footer } from '@/components/landing/Footer';
-import { BrandMark } from '@/components/icons/BrandMark';
 
 export default async function ReposPage() {
   const user = await getCurrentUser();
@@ -30,9 +29,9 @@ return (
         </section>
       </div>
 
-      <div className="hidden sm:block">
+
         <Footer />
-      </div>
+
     </main>
   );
 }

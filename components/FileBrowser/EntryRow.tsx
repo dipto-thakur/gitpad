@@ -39,11 +39,20 @@ export function EntryRow({
 }) {
   const isDir = entry.type === 'dir';
 
+  // Path segments must be percent-encoded individually before being
+  // dropped into a <Link> href — a raw path like
+  // "app/repos/[owner]/[repo]/page.tsx" (a real file in this repo) breaks
+  // Next's dynamic-route parsing if the brackets reach <Link> unescaped.
+  const encodedPath = entry.path.split('/').map(encodeURIComponent).join('/');
+
   return (
     <div
       className={cn(
-        'flex items-center gap-0.5',
-        !isLast && !isOpen && 'border-b  bg-zinc-50/95 dark:bg-zinc-950/95',
+        'flex min-w-0 items-center gap-0.5',
+        'bg-transparent',
+        'transition-colors duration-150',
+        'hover:bg-zinc-900/[0.025] dark:hover:bg-white/[0.025]',
+        !isLast && !isOpen && 'border-b border-zinc-200/40 dark:border-zinc-800/40',
       )}
     >
       {isDir ? (
@@ -72,7 +81,7 @@ export function EntryRow({
       ) : (
         <RowLink
           className="flex-1"
-          href={`/repos/${owner}/${repo}/edit/${entry.path}?branch=${encodeURIComponent(branch)}`}
+          href={`/repos/${owner}/${repo}/edit/${encodedPath}?branch=${encodeURIComponent(branch)}`}
           icon={getFileIcon(entry.name)}
           label={entry.name}
           meta={

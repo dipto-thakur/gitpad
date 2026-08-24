@@ -4,8 +4,6 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 
 import "./globals.css";
-import { BackgroundTexture } from "@/components/theme/background-texture";
-
 import { AuthProvider } from "@/components/AuthProvider";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { ScrollbarStyles } from '@/components/ui/scrollbar';
@@ -17,7 +15,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://diptothakur.vercel.app/"),
+  metadataBase: new URL("https://gitnote.vercel.app"),
 
   title: {
     default: "GitNote",
@@ -53,22 +51,32 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
+    apple: "/favicon.ico",
   },
 
   openGraph: {
-    type: "website",
-    title: "GitNote",
+    type: 'website',
+    title: 'GitPad',
     description:
-      "A lightweight GitHub document editor for committing changes without Git.",
-    siteName: "GitNote",
+      'A lightweight GitHub document editor for committing changes without Git.',
+    siteName: 'GitPad',
+    url: 'https://gitnote.vercel.app',
+    images: [
+      {
+        url: '/opengraph-image.png',
+        width: 1200,
+        height: 633,
+        alt: 'GitPad — edit and commit GitHub files from your browser',
+      },
+    ],
   },
-
+  
   twitter: {
-    card: "summary_large_image",
-    title: "GitNote",
+    card: 'summary_large_image',
+    title: 'GitPad',
     description:
-      "Edit and commit repository files directly from your browser.",
+      'Edit and commit repository files directly from your browser.',
+    images: ['/opengraph-image.png'],
   },
 };
 
@@ -96,7 +104,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >      <ScrollbarStyles />
-   <BackgroundTexture />
+
 
           <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>

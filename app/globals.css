@@ -17,6 +17,8 @@
     --destructive: 0 72% 45%;
     --destructive-foreground: 0 0% 98%;
     --ring: 240 5.9% 10%;
+    --success: 142 71% 45%;
+    --warning: 38 92% 50%;
   }
 
   .dark {
@@ -32,6 +34,8 @@
     --destructive: 0 63% 40%;
     --destructive-foreground: 0 0% 98%;
     --ring: 240 4.9% 83.9%;
+    --success: 142 71% 45%;
+    --warning: 38 92% 50%;
   }
 }
 
@@ -39,18 +43,46 @@
   * {
     @apply border-border;
   }
+
   html {
     -webkit-tap-highlight-color: transparent;
+    color-scheme: light dark;
+    /* Lets the OS-drawn scrollbar and form-control chrome (checkboxes,
+       date pickers, etc.) match the active theme instead of always
+       rendering light. */
   }
+
   body {
     @apply bg-background text-foreground antialiased;
+    /* Prevents the whole page from rubber-banding horizontally on
+       overscroll — a common source of "this feels like a website, not
+       an app" on mobile Safari. */
+    overscroll-behavior-x: none;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'cv11', 'ss01';
   }
+
   /* Visible keyboard focus everywhere, never suppressed. */
   :focus-visible {
     @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
+
+  /* Custom selection color instead of the browser default blue — small
+     detail, but a mismatched selection highlight is one of the fastest
+     "this wasn't designed carefully" tells. */
+  ::selection {
+    @apply bg-zinc-900/10 text-inherit dark:bg-zinc-100/20;
+  }
+
   textarea {
     tab-size: 2;
+  }
+
+  /* Disable iOS's automatic tap-to-zoom on double-tap for interactive
+     surfaces — rows/buttons already handle taps themselves. */
+  button,
+  a {
+    touch-action: manipulation;
   }
 }
 
@@ -66,10 +98,34 @@
     padding-top: max(1.5rem, env(safe-area-inset-top));
     padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
   }
+
+  /* Subtle grain overlay — apply to a fixed, pointer-events-none div
+     layered behind page content (see app/layout.tsx) rather than baking
+     texture into every individual background color. SVG-based (no image
+     asset/network request), theme-aware opacity via currentColor trick
+     isn't needed since this is monochrome noise either way. */
+  .bg-noise {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+  }
+
+  /* Fully hidden scrollbar for horizontal-scroll UI (breadcrumb, tab
+     strips) where any visible scrollbar would clutter a single-line
+     control. Prefer components/ui/scrollbar.tsx's `scrollbar-thin` for
+     larger scrollable panes where the bar itself is useful affordance. */
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;

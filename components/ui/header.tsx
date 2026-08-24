@@ -41,24 +41,22 @@ export function Header({ actions, className, collapsed = false }: HeaderProps) {
       <header
         ref={headerRef}
         className={cn(
-          'sticky top-0  z-20 flex items-center justify-between gap-1.5',
-          'border-b border-zinc-200/80 bg-zinc-50/80 backdrop-blur-md',
-          'px-3 py-2.5 sm:px-10 sm:py-2.5',
-          'pt-[max(0.5rem,env(safe-area-inset-top))]',
-          'dark:border-zinc-800/80 dark:bg-zinc-950/80',
+          'sticky top-0 z-20 flex items-center justify-between',
+          'min-h-14 gap-4',
+          'border-b border-zinc-200/60 bg-zinc-50/75 backdrop-blur-md',
+          'px-4 py-3 sm:px-10 sm:py-3',
+          'pt-[max(0.75rem,env(safe-area-inset-top))]',
+          'dark:border-zinc-800/60 dark:bg-zinc-950/75',
           className,
         )}
       >
-        <BrandMark className="h-7 w-auto shrink-0 text-foreground sm:h-6" />
-
-        <div className="flex shrink-0 items-center gap-1">
-       
+<BrandMark className="h-6 w-auto sm:h-7 lg:h-8" />
+  
+        <div className="flex shrink-0 items-center gap-1.5">
           <ThemeToggle />
-             {actions}
+          {actions}
         </div>
       </header>
-
-      {/*<div aria-hidden="true" style={{ height }} />*/}
     </>
   );
 }

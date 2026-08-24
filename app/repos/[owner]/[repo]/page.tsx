@@ -37,31 +37,55 @@ export default async function RepoPage({
     <main className="min-h-dvh bg-zinc-50 dark:bg-zinc-950/95">
       <div className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col">
         <Header />
-
-        <section className="min-w-0 flex-1 px-3 pb-6 pt-3 sm:px-10 sm:pb-10 sm:pt-8">
+  
+        <section className="min-w-0 flex-1 px-3 pb-8 pt-3 sm:px-10 sm:pb-12 sm:pt-8">
           <div className="mb-3 flex items-center justify-between gap-2 sm:mb-4">
             <Link
               href="/repos"
               className="-ml-1.5 flex h-9 shrink-0 items-center gap-1 rounded-lg px-2 text-[13px] font-medium text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-900 active:bg-zinc-100 dark:text-zinc-500 dark:hover:bg-zinc-900 dark:hover:text-zinc-100 dark:active:bg-zinc-900"
             >
               <RiArrowLeftSLine className="h-[18px] w-[18px] shrink-0" />
-              <span className="sm:inline">Repositories</span>
+              <span>Repositories</span>
             </Link>
-
-            <BranchSwitcher owner={owner} repo={repo} branches={branchesResult.data} activeBranch={branch} />
+  
+            <BranchSwitcher
+              owner={owner}
+              repo={repo}
+              branches={branchesResult.data}
+              activeBranch={branch}
+            />
           </div>
-
+  
           <div className="mb-3 min-w-0 px-0.5 sm:mb-5">
-            <Directory owner={owner} repo={repoResult.data.name}/>
+            <Directory
+              owner={owner}
+              repo={repoResult.data.name}
+            />
           </div>
-
-          <div className="min-w-0 overflow-hidden rounded-xl border border-zinc-200/80 bg-zinc-100/40 p-1 dark:border-zinc-800/80 dark:bg-zinc-900/40 sm:p-2.5">
-            <FileBrowser owner={owner} repo={repo} branch={branch} path="" />
-          </div>
+  
+          <div className="
+    min-w-0 overflow-hidden
+    rounded-2xl
+    border border-zinc-200/70
+    bg-white/35
+    p-2
+    shadow-[0_1px_2px_rgba(0,0,0,0.02)]
+    backdrop-blur-sm
+    dark:border-zinc-800/70
+    dark:bg-zinc-900/25
+    dark:shadow-none
+    sm:p-3
+  "
+>
+  <FileBrowser
+    owner={owner}
+    repo={repo}
+    branch={branch}
+    path=""
+  />
+</div>
         </section>
-      </div>
-
-      <div className="hidden sm:block">
+  
         <Footer />
       </div>
     </main>

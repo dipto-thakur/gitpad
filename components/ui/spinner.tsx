@@ -2,7 +2,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { BrandMark } from '@/components/icons/BrandMark';
+import { FolderIcon, BrandMark } from '@/components/icons/BrandMark';
 import { cn } from '@/lib/utils';
 
 interface SpinnerProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -35,7 +35,15 @@ export function Spinner({ size = 'default', className, ...props }: SpinnerProps)
         transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
         className="motion-reduce:!animate-none motion-reduce:opacity-60"
       >
-        <BrandMark className={cn(SIZE_MAP[size], 'text-zinc-900 dark:text-zinc-100')} />
+<div className="flex flex-col items-center gap-3 text-zinc-950 dark:text-zinc-50">
+  <FolderIcon className="h-18 w-auto sm:h-22 animate-pulse" />
+  <span
+    className="text-base sm:text-lg font-bold tracking-tight"
+    style={{ fontFamily: "'Californian FB', ui-monospace, monospace" }}
+  >
+    Gitpad
+  </span>
+</div>
       </motion.div>
       <span className="sr-only">Loading…</span>
     </div>

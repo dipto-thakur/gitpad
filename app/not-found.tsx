@@ -15,7 +15,7 @@ export default function NotFound() {
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center bg-zinc-50 px-4 dark:bg-zinc-950">
       <div className="mx-auto flex max-w-sm flex-col items-center text-center">
-        <BrandMark className="h-6 w-auto text-zinc-300 dark:text-zinc-700" />
+      <BrandMark className="h-7 w-auto text-zinc-950 dark:text-zinc-50" />
 
         <p className="mt-6 font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-zinc-400 dark:text-zinc-500">
           Error 404
