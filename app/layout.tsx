@@ -16,7 +16,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://gitpad.vercel.app'),
+  metadataBase: new URL('https://gitnote.vercel.app/'),
 
   title: {
     default: 'GitPad',
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     title: 'GitPad',
     description: 'A lightweight GitHub document editor for committing changes without Git.',
     siteName: 'GitPad',
-    url: 'https://gitpad.vercel.app',
+    url: 'https://gitnote.vercel.app',
     images: [
       {
         url: '/opengraph-image.png',
