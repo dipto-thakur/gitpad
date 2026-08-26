@@ -4,7 +4,7 @@
 
 # GitPad
 
-**Edit any UTF-8 file in your GitHub repos and commit it directly.**
+**Edit any file in your GitHub repos and commit it directly.**
 No git, no terminal, no clone, no IDE.
 
 [Live Demo](https://gitnote.vercel.app/) · [Report Bug](../../issues) · [Request Feature](../../issues)
