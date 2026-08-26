@@ -51,18 +51,18 @@ function ErrorState({
   icon?: React.ReactNode;
 }) {
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-zinc-50 px-4 dark:bg-zinc-950/95">
+    <main className="flex min-h-dvh items-center justify-center bg-background px-4 dark:bg-background/95">
       <div className="w-full max-w-sm">
         <div className="mb-4 flex justify-center">
-          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900">
+          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-zinc-100 dark:bg-muted">
             {icon ?? <FileWarning className="h-5 w-5 text-red-500/90 dark:text-red-400/80" strokeWidth={2} />}
           </div>
         </div>
 
         {path && (
-          <p className="mb-2 truncate text-center font-mono text-[12px] text-zinc-400 dark:text-zinc-500">
+          <p className="mb-2 truncate text-center font-mono text-[12px] text-muted-foreground text-muted-foreground">
             {path}
-            {branch && <span className="text-zinc-300 dark:text-zinc-700"> · {branch}</span>}
+            {branch && <span className="text-muted-foreground/50 dark:text-zinc-700"> · {branch}</span>}
           </p>
         )}
 
@@ -75,7 +75,7 @@ function ErrorState({
 
         <Link
           href={`/repos/${owner}/${repo}`}
-          className="mt-4 flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-[13.5px] font-medium text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800 active:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-100 dark:active:bg-zinc-900"
+          className="mt-4 flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-[13.5px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:bg-zinc-100 dark:text-muted-foreground dark:hover:bg-zinc-900 dark:hover:text-zinc-100 dark:active:bg-zinc-900"
         >
           <ArrowLeft className="h-3.5 w-3.5" strokeWidth={2} />
           Back to repository

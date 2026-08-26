@@ -119,11 +119,11 @@ export function EntryOptionsMenu({
           {isDir && (
             <>
               <DropdownMenuItem onSelect={() => setCreateMode('file')}>
-                <FilePlus className="text-zinc-400 dark:text-zinc-500" strokeWidth={2} />
+                <FilePlus className="text-muted-foreground text-muted-foreground" strokeWidth={2} />
                 New file
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => setCreateMode('folder')}>
-                <FolderPlus className="text-zinc-400 dark:text-zinc-500" strokeWidth={2} />
+                <FolderPlus className="text-muted-foreground text-muted-foreground" strokeWidth={2} />
                 New folder
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -131,12 +131,12 @@ export function EntryOptionsMenu({
           )}
 
           <DropdownMenuItem onSelect={() => setRenameOpen(true)}>
-            <Pencil className="text-zinc-400 dark:text-zinc-500" strokeWidth={2} />
+            <Pencil className="text-muted-foreground text-muted-foreground" strokeWidth={2} />
             Rename
           </DropdownMenuItem>
 
           <DropdownMenuItem onSelect={copyPath}>
-            <Copy className="text-zinc-400 dark:text-zinc-500" strokeWidth={2} />
+            <Copy className="text-muted-foreground text-muted-foreground" strokeWidth={2} />
             {copied ? 'Copied!' : 'Copy path'}
           </DropdownMenuItem>
 
@@ -144,9 +144,9 @@ export function EntryOptionsMenu({
 
           <DropdownMenuItem onSelect={download} disabled={downloading}>
             {downloading ? (
-              <Loader2 className="animate-spin text-zinc-400 dark:text-zinc-500" strokeWidth={2} />
+              <Loader2 className="animate-spin text-muted-foreground text-muted-foreground" strokeWidth={2} />
             ) : (
-              <Download className="text-zinc-400 dark:text-zinc-500" strokeWidth={2} />
+              <Download className="text-muted-foreground text-muted-foreground" strokeWidth={2} />
             )}
             {isDir ? 'Download as .zip' : 'Download'}
           </DropdownMenuItem>

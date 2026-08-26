@@ -39,7 +39,7 @@ export function Profile({
         whileTap={{ scale: 0.92 }}
         onClick={() => setOpen(true)}
         aria-label="Profile"
-        className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-zinc-200/80 transition-colors hover:border-zinc-300 dark:border-zinc-800/80 dark:hover:border-zinc-700"
+        className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border/80 transition-colors hover:border-zinc-300 border-border/80 dark:hover:border-zinc-700"
       >
         <Avatar image={image} login={login} className="h-full w-full" textClassName="text-xs" />
       </motion.button>
@@ -55,7 +55,7 @@ export function Profile({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="flex items-center gap-1 truncate text-[12.5px] text-zinc-400 transition-colors hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300"
+                className="flex items-center gap-1 truncate text-[12.5px] text-muted-foreground transition-colors hover:text-foreground text-muted-foreground dark:hover:text-muted-foreground/50"
               >
                 <RiGithubFill className="h-3.5 w-3.5 shrink-0" />@{login}
               </a>

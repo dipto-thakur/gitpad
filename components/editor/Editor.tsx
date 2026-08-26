@@ -115,7 +115,7 @@ export function Editor({
         .includes('deleted from the repository'));
 
   return (
-    <div className="flex min-h-dvh flex-col bg-zinc-50 dark:bg-zinc-950">
+    <div className="flex min-h-dvh flex-col bg-background dark:bg-background">
       <EditorHeader
         owner={owner}
         repo={repo}
@@ -138,7 +138,7 @@ export function Editor({
             }}
             onKeyDown={handleTab}
             spellCheck={true}
-            className="min-h-full w-full flex-1 resize-none border-none bg-transparent  font-mono  leading-[1.75] tracking-[-0.01em] text-zinc-800 shadow-none outline-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:text-zinc-200"
+            className="min-h-full w-full flex-1 resize-none border-none bg-transparent  font-mono  leading-[1.75] tracking-[-0.01em] text-foreground shadow-none outline-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground"
           />
         </div>
       </main>

@@ -47,7 +47,7 @@ export function EditorActionsMenu({
               {fileName}
             </DrawerTitle>
             {dirPath && (
-              <p className="truncate text-[13px] text-zinc-400 dark:text-zinc-500">
+              <p className="truncate text-[13px] text-muted-foreground text-muted-foreground">
                 {dirPath}
               </p>
             )}

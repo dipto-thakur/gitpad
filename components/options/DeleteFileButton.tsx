@@ -119,9 +119,9 @@ export function DeleteFileButton({
               Delete {fileName}?
             </DrawerTitle>
 
-            <DrawerDescription className="text-[13px] text-zinc-400 dark:text-zinc-500">
+            <DrawerDescription className="text-[13px] text-muted-foreground text-muted-foreground">
               This commits a deletion directly to{' '}
-              <strong className="font-medium text-zinc-600 dark:text-zinc-300">
+              <strong className="font-medium text-muted-foreground/50 dark:text-muted-foreground/50">
                 {branch}
               </strong>
               .

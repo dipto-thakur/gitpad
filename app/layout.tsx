@@ -1,47 +1,48 @@
-// app/layout.tsx
+// file: app/layout.tsx
+import type { Metadata, Viewport } from 'next';
 
-import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
-
-import "./globals.css";
-import { AuthProvider } from "@/components/AuthProvider";
-import { ThemeProvider } from "@/components/theme/theme-provider";
+import './globals.css';
+import { AuthProvider } from '@/components/AuthProvider';
+import { ThemeProvider } from '@/components/theme/theme-provider';
 import { ScrollbarStyles } from '@/components/ui/scrollbar';
+import { sans, mono } from '@/lib/fonts';
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-  display: "swap",
-});
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#fdfcfb' },
+    { media: '(prefers-color-scheme: dark)', color: '#161412' },
+  ],
+  colorScheme: 'light dark',
+};
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://gitnote.vercel.app"),
+  metadataBase: new URL('https://gitpad.vercel.app'),
 
   title: {
-    default: "GitNote",
-    template: "%s · GitNote",
+    default: 'GitPad',
+    template: '%s · GitPad',
   },
 
   description:
-    "Edit, create, and commit repository files directly to GitHub from any device. No Git installation. No terminal.",
+    'Edit, create, and commit repository files directly to GitHub from any device. No Git installation. No terminal.',
 
-  applicationName: "GitNote",
+  applicationName: 'GitPad',
 
   keywords: [
-    "GitHub",
-    "Git",
-    "Repository",
-    "README",
-    "Markdown",
-    "Documentation",
-    "Commit",
-    "Editor",
-    "Developer Tools",
+    'GitHub',
+    'Git',
+    'Repository',
+    'README',
+    'Markdown',
+    'Documentation',
+    'Commit',
+    'Editor',
+    'Developer Tools',
   ],
 
-  authors: [{ name: "Dipto Thakur" }],
-  creator: "Dipto Thakur",
-  publisher: "Dipto Thakur",
+  authors: [{ name: 'Dipto Thakur' }],
+  creator: 'Dipto Thakur',
+  publisher: 'Dipto Thakur',
 
   robots: {
     index: true,
@@ -49,63 +50,41 @@ export const metadata: Metadata = {
   },
 
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/favicon.ico",
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/favicon.ico',
   },
 
   openGraph: {
     type: 'website',
     title: 'GitPad',
-    description:
-      'A lightweight GitHub document editor for committing changes without Git.',
+    description: 'A lightweight GitHub document editor for committing changes without Git.',
     siteName: 'GitPad',
-    url: 'https://gitnote.vercel.app',
+    url: 'https://gitpad.vercel.app',
     images: [
       {
         url: '/opengraph-image.png',
         width: 1200,
-        height: 633,
+        height: 630,
         alt: 'GitPad — edit and commit GitHub files from your browser',
       },
     ],
   },
-  
+
   twitter: {
     card: 'summary_large_image',
     title: 'GitPad',
-    description:
-      'Edit and commit repository files directly from your browser.',
+    description: 'Edit and commit repository files directly from your browser.',
     images: ['/opengraph-image.png'],
   },
 };
 
-export const viewport: Viewport = {
-  themeColor: "#09090b",
-  colorScheme: "dark light",
-};
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-      className={inter.variable}
-    >
-      <body className="min-h-screen bg-background font-sans antialiased">
-
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >      <ScrollbarStyles />
-
-
+    <html lang="en" suppressHydrationWarning className={`${sans.variable} ${mono.variable}`}>
+      <body className="min-h-dvh bg-background font-sans antialiased">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <ScrollbarStyles />
           <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>
       </body>

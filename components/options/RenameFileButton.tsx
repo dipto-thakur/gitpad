@@ -115,9 +115,9 @@ export function RenameFileButton({
               Rename {fileName}
             </DrawerTitle>
 
-            <DrawerDescription className="text-[13px] text-zinc-400 dark:text-zinc-500">
+            <DrawerDescription className="text-[13px] text-muted-foreground text-muted-foreground">
               Two commits to{' '}
-              <strong className="font-medium text-zinc-600 dark:text-zinc-300">
+              <strong className="font-medium text-muted-foreground/50 dark:text-muted-foreground/50">
                 {branch}
               </strong>{' '}
               — create at the new path, then remove the old one.
@@ -125,13 +125,13 @@ export function RenameFileButton({
           </DrawerHeader>
 
           <DrawerBody className="flex flex-col gap-3">
-            <div className="flex items-start gap-2.5 rounded-xl border border-zinc-200/80 bg-zinc-100/60 px-3.5 py-3 dark:border-zinc-800/80 dark:bg-zinc-900/60">
+            <div className="flex items-start gap-2.5 rounded-xl border border-border/80 bg-muted/60 px-3.5 py-3 border-border/80 dark:bg-muted/60">
               <Info
-                className="mt-0.5 h-4 w-4 shrink-0 text-zinc-400 dark:text-zinc-500"
+                className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground text-muted-foreground"
                 strokeWidth={2}
               />
 
-              <p className="text-[13px] leading-snug text-zinc-500 dark:text-zinc-400">
+              <p className="text-[13px] leading-snug text-muted-foreground dark:text-muted-foreground">
                 The old file is only removed once the new one is created
                 successfully.
               </p>

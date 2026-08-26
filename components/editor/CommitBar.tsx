@@ -63,7 +63,7 @@ export function CommitBar({
         </div>
       )}
 
-      <div      className="flex items-center gap-2">
+      <div className="flex items-center gap-2">
         <Input
           value={message}
           onChange={(e) => onMessageChange(e.target.value)}

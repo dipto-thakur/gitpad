@@ -42,7 +42,7 @@ export function RepoRow({
         aria-label={favorite ? 'Remove from favorites' : 'Add to favorites'}
         aria-pressed={favorite}
         onClick={() => onToggleFavorite(repo.fullName)}
-        className="flex h-11 w-9 shrink-0 items-center justify-center text-zinc-300 transition-colors hover:text-zinc-500 dark:text-zinc-600 dark:hover:text-zinc-400"
+        className="flex h-11 w-9 shrink-0 items-center justify-center text-muted-foreground/50 transition-colors hover:text-muted-foreground dark:text-muted-foreground/50 dark:hover:text-muted-foreground"
       >
         {favorite ? (
           <RiStarFill className="h-4 w-4 text-amber-400" />

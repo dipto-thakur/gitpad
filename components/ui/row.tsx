@@ -10,8 +10,8 @@ function rowClasses(destructive: boolean | undefined, className?: string) {
   return cn(
     'flex w-full min-w-0 min-h-11 items-center gap-2.5 rounded px-2.5 py-2.5 text-left text-[13.5px]',
     'transition-colors duration-100 active:scale-[0.99]',
-    'hover:bg-zinc-100/70 active:bg-zinc-100 dark:hover:bg-zinc-800/50 dark:active:bg-zinc-800/70',
-    destructive ? 'text-red-600 dark:text-red-400' : 'text-zinc-700 dark:text-zinc-200',
+    'hover:bg-muted/70 active:bg-zinc-100 hover:bg-muted/50 dark:active:bg-zinc-800/70',
+    destructive ? 'text-red-600 dark:text-red-400' : 'text-zinc-700 text-foreground',
     className,
   );
 }
@@ -35,7 +35,7 @@ function RowContent({
         <span
           className={cn(
             'flex shrink-0 items-center justify-center [&>svg]:h-[17px] [&>svg]:w-[17px]',
-            destructive ? 'text-red-500/80 dark:text-red-400/80' : 'text-zinc-400 dark:text-zinc-500',
+            destructive ? 'text-red-500/80 dark:text-red-400/80' : 'text-muted-foreground text-muted-foreground',
           )}
         >
           {icon}
@@ -45,12 +45,12 @@ function RowContent({
         {label}
       </span>
       {meta && (
-        <span className="shrink-0 truncate text-[11.5px] text-zinc-400 dark:text-zinc-500">
+        <span className="shrink-0 truncate text-[11.5px] text-muted-foreground text-muted-foreground">
           {meta}
         </span>
       )}
       {chevron && (
-        <ChevronRight className="h-[15px] w-[15px] shrink-0 text-zinc-300 dark:text-zinc-600" strokeWidth={3} />
+        <ChevronRight className="h-[15px] w-[15px] shrink-0 text-muted-foreground/50 dark:text-muted-foreground/50" strokeWidth={3} />
       )}
     </>
   );
@@ -113,7 +113,7 @@ export function StaticRow({
   return (
     <div
       className={cn(
-        'flex min-h-11 min-w-0 items-center gap-2.5 px-2.5 py-2 text-[13.5px] text-zinc-400 dark:text-zinc-500',
+        'flex min-h-11 min-w-0 items-center gap-2.5 px-2.5 py-2 text-[13.5px] text-muted-foreground text-muted-foreground',
         className,
       )}
     >

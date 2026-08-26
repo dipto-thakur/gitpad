@@ -27,15 +27,15 @@ export function RepoListSection({
   return (
     <section>
       <div className="mb-2 flex items-baseline justify-between px-1">
-        <h2 className="text-[11px] font-medium uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+        <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground text-muted-foreground">
           {title}
         </h2>
         {typeof count === 'number' && (
-          <span className="text-[11px] tabular-nums text-zinc-300 dark:text-zinc-700">{count}</span>
+          <span className="text-[11px] tabular-nums text-muted-foreground/50 dark:text-zinc-700">{count}</span>
         )}
       </div>
 
-      <ul className="flex flex-col gap-0.5 rounded-xl border border-zinc-200/80 bg-zinc-100/60 p-1 dark:border-zinc-800/80 dark:bg-zinc-900/40">
+      <ul className="flex flex-col gap-0.5 rounded-xl border border-border/80 bg-muted/60 p-1 border-border/80 dark:bg-muted/40">
       {repos.map((r, i) => (
           <RepoRow
             key={r.id}

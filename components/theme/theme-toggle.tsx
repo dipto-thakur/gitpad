@@ -3,16 +3,15 @@
 
 import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { RiMoonFill, RiSunFill } from 'react-icons/ri';
-import { cn } from '@/lib/utils';
 
 /**
- * Horizontal on/off switch (iOS-style), not an icon button — the knob
- * slides between two ends of a pill track, with the active mode's icon
- * shown on the knob itself. Track dims/tints slightly by mode so the
- * whole control communicates state even at a glance, not just the knob
- * position.
+ * Single icon button, not a switch — tapping toggles the theme and the
+ * icon cross-fades/rotates to reflect whichever mode is now active
+ * (matches the icon-button pattern used elsewhere in the header, e.g.
+ * the old back-button/options-menu triggers, rather than introducing a
+ * different control shape just for this one action).
  */
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
@@ -26,29 +25,35 @@ export function ThemeToggle() {
   return (
     <button
       type="button"
-      role="switch"
-      aria-checked={isDark}
       aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      className={cn(
-        'relative flex h-7 w-[38px] shrink-0 items-center rounded-full px-[3px] transition-colors duration-200',
-        isDark ? 'bg-zinc-800' : 'bg-zinc-200',
-      )}
+      className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:bg-zinc-100 dark:text-muted-foreground dark:hover:bg-zinc-900 dark:hover:text-zinc-100 dark:active:bg-zinc-900"
     >
-      <motion.span
-        layout
-        transition={{ type: 'spring', stiffness: 500, damping: 32 }}
-        className={cn(
-          'flex h-[20px] w-[20px] items-center justify-center rounded-full bg-white shadow-sm dark:bg-zinc-100',
-          isDark ? 'ml-auto' : 'ml-0',
-        )}
-      >
+      <AnimatePresence mode="wait" initial={false}>
         {isDark ? (
-          <RiMoonFill className="h-3.5 w-3.5 text-zinc-700" />
+          <motion.span
+            key="moon"
+            initial={{ opacity: 0, rotate: -90, scale: 0.5 }}
+            animate={{ opacity: 1, rotate: 0, scale: 1 }}
+            exit={{ opacity: 0, rotate: 90, scale: 0.5 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="flex"
+          >
+            <RiMoonFill className="h-[17px] w-[17px]" />
+          </motion.span>
         ) : (
-          <RiSunFill className="h-3.5 w-3.5 text-amber-500" />
+          <motion.span
+            key="sun"
+            initial={{ opacity: 0, rotate: 90, scale: 0.5 }}
+            animate={{ opacity: 1, rotate: 0, scale: 1 }}
+            exit={{ opacity: 0, rotate: -90, scale: 0.5 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="flex text-amber-500"
+          >
+            <RiSunFill className="h-[17px] w-[17px]" />
+          </motion.span>
         )}
-      </motion.span>
+      </AnimatePresence>
     </button>
   );
 }

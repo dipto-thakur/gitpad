@@ -17,7 +17,7 @@ export function SignOutButton() {
       </p>
 
       <div className="flex items-center justify-between gap-3">
-        <p className="text-[13px] text-zinc-500 dark:text-zinc-400">
+        <p className="text-[13px] text-muted-foreground dark:text-muted-foreground">
           Sign out of your GitHub session on this device.
         </p>
 
@@ -46,7 +46,7 @@ export function SignOutButton() {
               <button
                 type="button"
                 onClick={() => setConfirming(false)}
-                className="h-9 rounded-lg px-2.5 text-[13px] font-medium text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                className="h-9 rounded-lg px-2.5 text-[13px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground text-muted-foreground hover:bg-muted hover:text-foreground"
               >
                 Cancel
               </button>

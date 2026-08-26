@@ -25,7 +25,7 @@ export function Avatar({
   }
   return (
     <span
-      className={`${className ?? ''} flex items-center justify-center rounded-full bg-zinc-100 font-medium text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400 ${textClassName ?? ''}`}
+      className={`${className ?? ''} flex items-center justify-center rounded-full bg-zinc-100 font-medium text-muted-foreground bg-muted dark:text-muted-foreground ${textClassName ?? ''}`}
     >
       {login.slice(0, 2).toUpperCase()}
     </span>

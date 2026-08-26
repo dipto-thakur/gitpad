@@ -33,11 +33,11 @@ export function About() {
   ];
 
   return (
-    <section className="mx-auto max-auto px-6 py-16 bg-zinc-50/90 dark:border-zinc-800/80 dark:bg-zinc-950/95">
+    <section className="mx-auto max-auto px-6 py-16 bg-background/90 border-border/80 dark:bg-background/95">
       <div className="mx-auto max-w-lg text-center">
-        <p className="text-base leading-7 text-zinc-800 dark:text-zinc-200">
+        <p className="text-base leading-7 text-foreground text-foreground">
           Not an IDE. Not GitHub Desktop. GitPad does one thing 
-          <span className="text-zinc-500 dark:text-zinc-400"> open a file, edit it, commit it.</span>
+          <span className="text-muted-foreground dark:text-muted-foreground"> open a file, edit it, commit it.</span>
         </p>
 
         <ul className="mt-6 flex flex-wrap items-center justify-center gap-2">
@@ -47,9 +47,9 @@ export function About() {
               <li key={label}>
                 <Badge
                   variant="outline"
-                  className="gap-1.5 border-zinc-200/80 bg-white/60 py-1 pl-2 pr-2.5 text-zinc-600 backdrop-blur-sm transition-colors hover:border-zinc-300 hover:bg-white dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-300 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
+                  className="gap-1.5 border-border/80 bg-background/60 py-1 pl-2 pr-2.5 text-muted-foreground/50 backdrop-blur-sm transition-colors hover:border-zinc-300 hover:bg-background dark:border-zinc-800 dark:bg-muted/60 dark:text-muted-foreground/50 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
                 >
-                  {Icon && <Icon className="h-3.5 w-3.5 shrink-0 text-zinc-400 dark:text-zinc-500" />}
+                  {Icon && <Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground text-muted-foreground" />}
                   {label}
                 </Badge>
               </li>

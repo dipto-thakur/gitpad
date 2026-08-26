@@ -10,9 +10,9 @@ const STEPS = [
 
 export function HowItWorks() {
   return (
-    <section className="relative  bg-zinc-50/90 dark:border-zinc-800/80 dark:bg-zinc-950/95">
+    <section className="relative  bg-background/90 border-border/80 dark:bg-background/95">
       <div className="mx-auto max-w-5xl px-6 py-16 sm:py-20">
-        <h2 className="text-center font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-zinc-400 dark:text-zinc-500">
+        <h2 className="text-center font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground text-muted-foreground">
           How it works
         </h2>
 
@@ -27,16 +27,16 @@ export function HowItWorks() {
 
           {STEPS.map(({ icon: Icon, title, desc }, i) => (
             <li key={title} className="relative flex flex-col items-center text-center lg:items-start lg:text-left">
-              <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-zinc-200/80 bg-zinc-50 text-zinc-700 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300">
-                <Icon className="h-4 w-4" />
+              <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full  bg-background text-zinc-700  dark:bg-background dark:text-muted-foreground/50">
+                <Icon className="h-20 w-20" />
               </div>
 
-              <p className="mt-3 text-[13.5px] font-medium text-zinc-800 dark:text-zinc-200">
-                <span className="font-mono text-zinc-400 dark:text-zinc-600">{i + 1}. </span>
+              <p className="mt-3 text-[13.5px] font-medium text-foreground text-foreground">
+                <span className="font-mono text-muted-foreground dark:text-muted-foreground/50">{i + 1}. </span>
                 {title}
               </p>
 
-              <p className="mt-1 max-w-[180px] text-[12.5px] leading-relaxed text-zinc-500 dark:text-zinc-400">
+              <p className="mt-1 max-w-[180px] text-[12.5px] leading-relaxed text-muted-foreground dark:text-muted-foreground">
                 {desc}
               </p>
             </li>

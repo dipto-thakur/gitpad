@@ -41,7 +41,7 @@ export function ShareEntryButton({
       {status !== 'idle' ? (
         <RiCheckLine className="h-[15px] w-[15px] shrink-0 text-emerald-500" />
       ) : (
-        <RiShareLine className="h-[15px] w-[15px] shrink-0 text-zinc-400 dark:text-zinc-500" />
+        <RiShareLine className="h-[15px] w-[15px] shrink-0 text-muted-foreground text-muted-foreground" />
       )}
       {status === 'shared' ? 'Shared' : status === 'copied' ? 'Link copied!' : 'Share'}
     </DropdownMenuItem>

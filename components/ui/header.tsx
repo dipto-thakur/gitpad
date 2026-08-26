@@ -43,10 +43,10 @@ export function Header({ actions, className, collapsed = false }: HeaderProps) {
         className={cn(
           'sticky top-0 z-20 flex items-center justify-between',
           'min-h-14 gap-4',
-          'border-b border-zinc-200/60 bg-zinc-50/75 backdrop-blur-md',
+          'border-b border-zinc-200/60 bg-background/75 backdrop-blur-md',
           'px-4 py-3 sm:px-10 sm:py-3',
           'pt-[max(0.75rem,env(safe-area-inset-top))]',
-          'dark:border-zinc-800/60 dark:bg-zinc-950/75',
+          'dark:border-zinc-800/60 dark:bg-background/75',
           className,
         )}
       >

@@ -20,9 +20,9 @@ export function DropdownMenuContent({
         sideOffset={sideOffset}
         align={align}
         className={cn(
-          'z-50 min-w-[190px] max-w-[250px] overflow-hidden rounded-2xl border border-zinc-200/70 bg-white/95 p-1 backdrop-blur-xl',
+          'z-50 min-w-[190px] max-w-[250px] overflow-hidden rounded-2xl border border-zinc-200/70 bg-background/95 p-1 backdrop-blur-xl',
           'shadow-[0_2px_8px_-2px_rgba(0,0,0,0.06),0_12px_28px_-8px_rgba(0,0,0,0.10)]',
-          'dark:border-zinc-800/80 dark:bg-zinc-900/95 dark:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.3),0_12px_28px_-8px_rgba(0,0,0,0.5)]',
+          'border-border/80 dark:bg-muted/95 dark:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.3),0_12px_28px_-8px_rgba(0,0,0,0.5)]',
           'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-1 data-[side=top]:slide-in-from-bottom-1',
           'origin-[var(--radix-dropdown-menu-content-transform-origin)]',
           className,
@@ -48,7 +48,7 @@ export function DropdownMenuItem({
         'transition-colors duration-100 [&>svg]:h-[15px] [&>svg]:w-[15px] [&>svg]:shrink-0',
         variant === 'destructive'
           ? 'text-red-600 data-[highlighted]:bg-red-50 dark:text-red-400 dark:data-[highlighted]:bg-red-950/40'
-          : 'text-zinc-700 data-[highlighted]:bg-zinc-100 dark:text-zinc-200 dark:data-[highlighted]:bg-zinc-800/70',
+          : 'text-zinc-700 data-[highlighted]:bg-zinc-100 text-foreground dark:data-[highlighted]:bg-zinc-800/70',
         'data-[disabled]:pointer-events-none data-[disabled]:opacity-40',
         className,
       )}
@@ -64,7 +64,7 @@ export function DropdownMenuLabel({
   return (
     <DropdownMenuPrimitive.Label
       className={cn(
-        'px-2.5 pb-1 pt-1.5 text-[10.5px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500',
+        'px-2.5 pb-1 pt-1.5 text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground text-muted-foreground',
         className,
       )}
       {...props}
@@ -78,7 +78,7 @@ export function DropdownMenuSeparator({
 }: React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Separator>) {
   return (
     <DropdownMenuPrimitive.Separator
-      className={cn('my-1 h-px bg-zinc-200/70 dark:bg-zinc-800/70', className)}
+      className={cn('my-1 h-px bg-neutral-100/70 dark:bg-neutral-900/70', className)}
       {...props}
     />
   );

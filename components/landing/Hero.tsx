@@ -22,7 +22,7 @@ export function Hero() {
   };
 
   return (
-    <section className="relative overflow-hidden bg-zinc-50/90 dark:bg-zinc-950/95">
+    <section className="relative overflow-hidden bg-background/90 dark:bg-background/95">
 
       <div
         aria-hidden
@@ -48,7 +48,7 @@ export function Hero() {
 
           <div className="order-2 flex flex-col items-center text-center lg:order-1 lg:items-start lg:text-left">
             <motion.div variants={item}>
-              <Badge variant="outline" className="gap-1.5 border-zinc-200/80 bg-white/60 py-1 pl-1 pr-2.5 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/60">
+              <Badge variant="outline" className="gap-1.5 border-border/80 bg-background/60 py-1 pl-1 pr-2.5 backdrop-blur-sm dark:border-zinc-800 dark:bg-muted/60">
                 <span className="flex h-4 w-4 items-center justify-center rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900">
                   <RiGithubFill className="h-2.5 w-2.5" />
                 </span>
@@ -65,7 +65,7 @@ export function Hero() {
 
             <motion.p
               variants={item}
-              className="mt-4 max-w-sm text-[14.5px] leading-relaxed text-zinc-500 dark:text-zinc-400 sm:text-base"
+              className="mt-4 max-w-sm text-[14.5px] leading-relaxed text-muted-foreground dark:text-muted-foreground sm:text-base"
             >
               A lightweight GitHub document client. Open a file, edit it, commit.
               no Git, no terminal, no local clone.
@@ -78,7 +78,7 @@ export function Hero() {
                 href={siteConfig.repoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex h-11 items-center gap-1.5 rounded-xl px-4 text-[13.5px] font-medium text-zinc-500 transition-colors hover:text-zinc-900 active:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 dark:active:text-zinc-100"
+                className="group flex h-11 items-center gap-1.5 rounded-xl px-4 text-[13.5px] font-medium text-muted-foreground transition-colors hover:text-zinc-900 active:text-zinc-900 dark:text-muted-foreground dark:hover:text-zinc-100 dark:active:text-zinc-100"
               >
                 View source
                 <RiArrowRightLine className="h-[15px] w-[15px] shrink-0 transition-transform duration-150 group-hover:translate-x-0.5" />
@@ -87,7 +87,7 @@ export function Hero() {
 
             <motion.div
               variants={item}
-              className="mt-8 flex items-center gap-2 text-[12px] text-zinc-400 dark:text-zinc-600"
+              className="mt-8 flex items-center gap-2 text-[12px] text-muted-foreground dark:text-muted-foreground/50"
             >
               No install · Sign in with GitHub · Free
             </motion.div>

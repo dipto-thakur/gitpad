@@ -7,6 +7,12 @@ const config: Config = {
   content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
   theme: {
     extend: {
+
+        fontFamily: {
+          sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+          mono: ['var(--font-mono)', 'ui-monospace', 'monospace'],
+        },
+
       colors: {
         // Semantic, monochrome — driven by CSS variables in globals.css so
         // light/dark just swap variable values, no color logic in markup.
@@ -27,9 +33,7 @@ const config: Config = {
         DEFAULT: '10px',
         lg: '14px',
       },
-      fontFamily: {
-        sans: ['var(--font-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-      },
+
       spacing: {
         18: '4.5rem', // 72px
       },

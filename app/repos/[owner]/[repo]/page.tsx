@@ -34,7 +34,7 @@ export default async function RepoPage({
   const branch = isKnownBranch ? activeBranch : repoResult.data.defaultBranch;
 
   return (
-    <main className="min-h-dvh bg-zinc-50 dark:bg-zinc-950/95">
+    <main className="min-h-dvh bg-background dark:bg-background/95">
       <div className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col">
         <Header />
   
@@ -42,7 +42,7 @@ export default async function RepoPage({
           <div className="mb-3 flex items-center justify-between gap-2 sm:mb-4">
             <Link
               href="/repos"
-              className="-ml-1.5 flex h-9 shrink-0 items-center gap-1 rounded-lg px-2 text-[13px] font-medium text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-900 active:bg-zinc-100 dark:text-zinc-500 dark:hover:bg-zinc-900 dark:hover:text-zinc-100 dark:active:bg-zinc-900"
+              className="-ml-1.5 flex h-9 shrink-0 items-center gap-1 rounded-lg px-2 text-[13px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-zinc-900 active:bg-zinc-100 text-muted-foreground dark:hover:bg-zinc-900 dark:hover:text-zinc-100 dark:active:bg-zinc-900"
             >
               <RiArrowLeftSLine className="h-[18px] w-[18px] shrink-0" />
               <span>Repositories</span>
@@ -67,12 +67,12 @@ export default async function RepoPage({
     min-w-0 overflow-hidden
     rounded-2xl
     border border-zinc-200/70
-    bg-white/35
+    bg-background/35
     p-2
     shadow-[0_1px_2px_rgba(0,0,0,0.02)]
     backdrop-blur-sm
     dark:border-zinc-800/70
-    dark:bg-zinc-900/25
+    dark:bg-muted/25
     dark:shadow-none
     sm:p-3
   "
@@ -94,14 +94,14 @@ export default async function RepoPage({
 
 function ErrorState({ message }: { message: string }) {
   return (
-    <main className="min-h-dvh bg-zinc-50 dark:bg-zinc-950">
+    <main className="min-h-dvh bg-background dark:bg-background">
       <div className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col">
         <Header />
 
         <div className="flex flex-1 items-center justify-center px-4">
           <div className="w-full max-w-sm">
             <div className="mb-4 flex justify-center">
-              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900">
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-zinc-100 dark:bg-muted">
                 <RiAlertLine className="h-5 w-5 text-red-500/90 dark:text-red-400/80" />
               </div>
             </div>
@@ -110,7 +110,7 @@ function ErrorState({ message }: { message: string }) {
 
             <Link
               href="/repos"
-              className="mt-4 flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-[13.5px] font-medium text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800 active:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-100 dark:active:bg-zinc-900"
+              className="mt-4 flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-[13.5px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:bg-zinc-100 dark:text-muted-foreground dark:hover:bg-zinc-900 dark:hover:text-zinc-100 dark:active:bg-zinc-900"
             >
               <RiArrowLeftSLine className="h-4 w-4" />
               Back to repositories

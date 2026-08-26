@@ -58,13 +58,13 @@ export function Directory({ owner, repo }: { owner: string; repo: string }) {
       <button
         type="button"
         onClick={() => navigateTo(0)}
-        className="shrink-0 truncate text-zinc-400 transition-colors hover:text-zinc-800 dark:text-zinc-500 dark:hover:text-zinc-200"
+        className="shrink-0 truncate text-muted-foreground transition-colors hover:text-foreground text-muted-foreground hover:text-foreground"
       >
         {owner}/{repo}
       </button>
 
       {segments.length > 0 && (
-        <ChevronRight className="h-3 w-3 shrink-0 text-zinc-300 dark:text-zinc-700" strokeWidth={2} />
+        <ChevronRight className="h-3 w-3 shrink-0 text-muted-foreground/50 dark:text-zinc-700" strokeWidth={2} />
       )}
 
       {shouldCollapse && (
@@ -74,7 +74,7 @@ export function Directory({ owner, repo }: { owner: string; repo: string }) {
               <button
                 type="button"
                 aria-label={`Show ${hiddenSegments.length} parent folders`}
-                className="flex h-6 shrink-0 items-center rounded-md px-1 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-800 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                className="flex h-6 shrink-0 items-center rounded-md px-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground hover:bg-muted hover:text-foreground"
               >
                 <MoreHorizontal className="h-3.5 w-3.5" strokeWidth={2} />
               </button>
@@ -88,7 +88,7 @@ export function Directory({ owner, repo }: { owner: string; repo: string }) {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <ChevronRight className="h-3 w-3 shrink-0 text-zinc-300 dark:text-zinc-700" strokeWidth={2} />
+          <ChevronRight className="h-3 w-3 shrink-0 text-muted-foreground/50 dark:text-zinc-700" strokeWidth={2} />
         </>
       )}
 
@@ -103,14 +103,14 @@ export function Directory({ owner, repo }: { owner: string; repo: string }) {
               disabled={isLast}
               className={
                 isLast
-                  ? 'min-w-0 truncate font-mono font-medium text-zinc-700 dark:text-zinc-200'
-                  : 'min-w-0 truncate font-mono text-zinc-400 transition-colors hover:text-zinc-800 dark:text-zinc-500 dark:hover:text-zinc-200'
+                  ? 'min-w-0 truncate font-mono font-medium text-zinc-700 text-foreground'
+                  : 'min-w-0 truncate font-mono text-muted-foreground transition-colors hover:text-foreground text-muted-foreground hover:text-foreground'
               }
             >
               {seg}
             </button>
             {!isLast && (
-              <ChevronRight className="h-3 w-3 shrink-0 text-zinc-300 dark:text-zinc-700" strokeWidth={2} />
+              <ChevronRight className="h-3 w-3 shrink-0 text-muted-foreground/50 dark:text-zinc-700" strokeWidth={2} />
             )}
           </span>
         );

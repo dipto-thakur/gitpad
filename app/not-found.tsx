@@ -13,11 +13,11 @@ import { BrandMark } from '@/components/icons/BrandMark';
  */
 export default function NotFound() {
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center bg-zinc-50 px-4 dark:bg-zinc-950">
+    <main className="flex min-h-dvh flex-col items-center justify-center bg-background px-4 dark:bg-background">
       <div className="mx-auto flex max-w-sm flex-col items-center text-center">
       <BrandMark className="h-7 w-auto text-zinc-950 dark:text-zinc-50" />
 
-        <p className="mt-6 font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-zinc-400 dark:text-zinc-500">
+        <p className="mt-6 font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground text-muted-foreground">
           Error 404
         </p>
 
@@ -25,7 +25,7 @@ export default function NotFound() {
           Page not found
         </h1>
 
-        <p className="mt-3 max-w-[280px] text-[13.5px] leading-relaxed text-zinc-500 dark:text-zinc-400">
+        <p className="mt-3 max-w-[280px] text-[13.5px] leading-relaxed text-muted-foreground dark:text-muted-foreground">
           The page you&apos;re looking for doesn&apos;t exist, or it may have been moved.
         </p>
 
@@ -40,7 +40,7 @@ export default function NotFound() {
 
           <NextLink
             href="/"
-            className="flex h-10 items-center justify-center gap-1.5 rounded-xl border border-zinc-200/80 px-4 text-[13.5px] font-medium text-zinc-600 transition-colors active:bg-zinc-100 dark:border-zinc-800 dark:text-zinc-300 dark:active:bg-zinc-900 sm:h-9"
+            className="flex h-10 items-center justify-center gap-1.5 rounded-xl border border-border/80 px-4 text-[13.5px] font-medium text-muted-foreground/50 transition-colors active:bg-zinc-100 dark:border-zinc-800 dark:text-muted-foreground/50 dark:active:bg-zinc-900 sm:h-9"
           >
             Home
             <RiArrowRightLine className="h-[15px] w-[15px] shrink-0" />

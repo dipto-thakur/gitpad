@@ -51,7 +51,7 @@ export function EntryRow({
         'flex min-w-0 items-center gap-0.5',
         'bg-transparent',
         'transition-colors duration-150',
-        'hover:bg-zinc-900/[0.025] dark:hover:bg-white/[0.025]',
+        'hover:bg-zinc-900/[0.025] dark:hover:bg-background/[0.025]',
         !isLast && !isOpen && 'border-b border-zinc-200/40 dark:border-zinc-800/40',
       )}
     >
@@ -86,7 +86,7 @@ export function EntryRow({
           label={entry.name}
           meta={
             !entry.supported ? (
-              <span className="flex items-center gap-1 text-zinc-400 dark:text-zinc-600">
+              <span className="flex items-center gap-1 text-muted-foreground dark:text-muted-foreground/50">
                 <RiAlertLine className="h-3.5 w-3.5" />
                 binary
               </span>

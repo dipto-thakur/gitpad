@@ -15,7 +15,7 @@ export default async function ReposPage() {
   const result = await listRepositoriesAction();
 
 return (
-    <main className="min-h-dvh bg-zinc-50 dark:bg-zinc-950/95">
+    <main className="min-h-dvh bg-background dark:bg-background/95">
       <div className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col">
       <Header actions={user && <Profile login={user.login} name={user.name} image={user.image} />} />
 

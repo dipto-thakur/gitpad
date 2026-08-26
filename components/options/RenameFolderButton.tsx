@@ -80,15 +80,15 @@ export function RenameFolderButton({
             <DrawerTitle className="truncate font-mono text-[15px] font-medium tracking-tight">
               Rename {folderName}/
             </DrawerTitle>
-            <DrawerDescription className="text-[13px] text-zinc-400 dark:text-zinc-500">
-              One create + delete commit pair per file inside, to <strong className="font-medium text-zinc-600 dark:text-zinc-300">{branch}</strong>.
+            <DrawerDescription className="text-[13px] text-muted-foreground text-muted-foreground">
+              One create + delete commit pair per file inside, to <strong className="font-medium text-muted-foreground/50 dark:text-muted-foreground/50">{branch}</strong>.
             </DrawerDescription>
           </DrawerHeader>
 
           <DrawerBody className="flex flex-col gap-3">
-            <div className="flex items-start gap-2.5 rounded-xl border border-zinc-200/80 bg-zinc-100/60 px-3.5 py-3 dark:border-zinc-800/80 dark:bg-zinc-900/60">
-              <Info className="mt-0.5 h-4 w-4 shrink-0 text-zinc-400 dark:text-zinc-500" strokeWidth={2} />
-              <p className="text-[13px] leading-snug text-zinc-500 dark:text-zinc-400">
+            <div className="flex items-start gap-2.5 rounded-xl border border-border/80 bg-muted/60 px-3.5 py-3 border-border/80 dark:bg-muted/60">
+              <Info className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground text-muted-foreground" strokeWidth={2} />
+              <p className="text-[13px] leading-snug text-muted-foreground dark:text-muted-foreground">
                 Large folders take longer — each file is moved individually. Don't close this until it finishes.
               </p>
             </div>

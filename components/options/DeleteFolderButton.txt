@@ -70,8 +70,8 @@ export function DeleteFolderButton({
             <DrawerTitle className="truncate font-mono text-[15px] font-medium tracking-tight">
               Delete {folderName}/?
             </DrawerTitle>
-            <DrawerDescription className="text-[13px] text-zinc-400 dark:text-zinc-500">
-              This commits deletions directly to <strong className="font-medium text-zinc-600 dark:text-zinc-300">{branch}</strong>.
+            <DrawerDescription className="text-[13px] text-muted-foreground text-muted-foreground">
+              This commits deletions directly to <strong className="font-medium text-muted-foreground/50 dark:text-muted-foreground/50">{branch}</strong>.
             </DrawerDescription>
           </DrawerHeader>
 

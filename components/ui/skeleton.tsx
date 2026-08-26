@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 
 export function Skeleton({ className }: { className?: string }) {
   return (
-    <div className={cn('relative overflow-hidden rounded-md bg-zinc-200/70 dark:bg-zinc-800', className)}>
+    <div className={cn('relative overflow-hidden rounded-md bg-muted bg-muted', className)}>
       <motion.div
         className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/60 to-transparent dark:via-white/10"
         initial={{ x: '-100%' }}

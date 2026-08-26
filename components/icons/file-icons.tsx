@@ -58,9 +58,9 @@ const ICON_MAP: Record<string, IconEntry> = {
   env: { icon: VscLock, className: 'text-emerald-500/90 dark:text-emerald-400/80' },
 
   // Docs
-  md: { icon: SiMarkdown, className: 'text-zinc-500 dark:text-zinc-400' },
-  mdx: { icon: SiMarkdown, className: 'text-zinc-500 dark:text-zinc-400' },
-  txt: { icon: VscFile, className: 'text-zinc-400 dark:text-zinc-500' },
+  md: { icon: SiMarkdown, className: 'text-muted-foreground dark:text-muted-foreground' },
+  mdx: { icon: SiMarkdown, className: 'text-muted-foreground dark:text-muted-foreground' },
+  txt: { icon: VscFile, className: 'text-muted-foreground text-muted-foreground' },
 
   // Other languages
   py: { icon: SiPython, className: 'text-blue-500/90 dark:text-blue-400/80' },
@@ -77,13 +77,13 @@ const ICON_MAP: Record<string, IconEntry> = {
   png: { icon: VscFileMedia, className: 'text-violet-400/90 dark:text-violet-500/70' },
   jpg: { icon: VscFileMedia, className: 'text-violet-400/90 dark:text-violet-500/70' },
   jpeg: { icon: VscFileMedia, className: 'text-violet-400/90 dark:text-violet-500/70' },
-  woff2: { icon: VscSymbolFile, className: 'text-zinc-400 dark:text-zinc-500' },
+  woff2: { icon: VscSymbolFile, className: 'text-muted-foreground text-muted-foreground' },
 };
 
 const SPECIAL_NAMES: Record<string, IconEntry> = {
   'readme.md': { icon: SiReadme, className: 'text-blue-500/90 dark:text-blue-400/80' },
   '.gitignore': { icon: SiGit, className: 'text-orange-500/90 dark:text-orange-400/80' },
-  '.gitkeep': { icon: SiGit, className: 'text-zinc-300 dark:text-zinc-700' },
+  '.gitkeep': { icon: SiGit, className: 'text-muted-foreground/50 dark:text-zinc-700' },
   'package.json': { icon: SiNpm, className: 'text-red-500/90 dark:text-red-400/80' },
   'package-lock.json': { icon: SiNpm, className: 'text-red-400/80 dark:text-red-500/60' },
   '.nvmrc': { icon: SiNodedotjs, className: 'text-green-500/90 dark:text-green-400/80' },
@@ -105,7 +105,7 @@ export function getFileIcon(filename: string): React.ReactElement {
   const ext = lower.includes('.') ? lower.split('.').pop()! : '';
   const match = ICON_MAP[ext];
   const Icon = match?.icon ?? VscFile;
-  const className = match?.className ?? 'text-zinc-400 dark:text-zinc-500';
+  const className = match?.className ?? 'text-muted-foreground text-muted-foreground';
 
   return <Icon className={className} />;
 }

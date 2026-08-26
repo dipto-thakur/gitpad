@@ -46,7 +46,7 @@ export function FileBrowser({
       className={cn(
         'min-w-0',
         depth > 0 &&
-          'ml-3 border-l border-zinc-200/70 bg-zinc-100/25 pl-3 dark:border-zinc-800/70 dark:bg-zinc-900/20',
+          'ml-3 border-l border-zinc-200/70 bg-zinc-100/25 pl-3 dark:border-zinc-800/70 dark:bg-muted/20',
       )}
     >
       {depth === 0 && (
@@ -102,7 +102,7 @@ export function FileBrowser({
           icon={<FolderOpen />}
           label="Empty folder"
           meta="Use ⋯ on the folder above to add files"
-          className="text-zinc-400 dark:text-zinc-600"
+          className="text-muted-foreground dark:text-muted-foreground/50"
         />
       )}
   

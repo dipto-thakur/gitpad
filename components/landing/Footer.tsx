@@ -14,7 +14,7 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border bg-zinc-50/100 dark:bg-zinc-950/100">
+    <footer className="border-t border-border bg-background/100 dark:bg-background/100">
       <div className="mx-auto flex max-w-5xl flex-col items-center gap-6 px-6 py-12 text-center">
       <BrandMark className="h-7 w-auto text-zinc-950 dark:text-zinc-50" />
       

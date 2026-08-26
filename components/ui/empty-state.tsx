@@ -37,15 +37,15 @@ export function EmptyState({
       )}
     >
       {icon && (
-        <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-b from-zinc-100 to-zinc-100/50 text-zinc-400 dark:from-zinc-900 dark:to-zinc-900/50 dark:text-zinc-500 [&>svg]:h-5 [&>svg]:w-5">
+        <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-b from-zinc-100 to-zinc-100/50 text-muted-foreground dark:from-zinc-900 dark:to-zinc-900/50 text-muted-foreground [&>svg]:h-5 [&>svg]:w-5">
           {icon}
         </span>
       )}
 
-      <p className="text-[14.5px] font-medium tracking-tight text-zinc-700 dark:text-zinc-200">{title}</p>
+      <p className="text-[14.5px] font-medium tracking-tight text-zinc-700 text-foreground">{title}</p>
 
       {description && (
-        <p className="mt-1 max-w-[260px] text-[13px] leading-relaxed text-zinc-400 dark:text-zinc-500">
+        <p className="mt-1 max-w-[260px] text-[13px] leading-relaxed text-muted-foreground text-muted-foreground">
           {description}
         </p>
       )}
@@ -71,7 +71,7 @@ export function EmptyState({
               whileTap={{ scale: 0.97 }}
               transition={{ duration: 0.1 }}
               onClick={secondaryAction.onClick}
-              className="flex h-10 items-center justify-center gap-1.5 rounded-xl border border-zinc-200/80 px-4 text-[13px] font-medium text-zinc-600 transition-colors active:bg-zinc-100 dark:border-zinc-800 dark:text-zinc-300 dark:active:bg-zinc-900 sm:h-9"
+              className="flex h-10 items-center justify-center gap-1.5 rounded-xl border border-border/80 px-4 text-[13px] font-medium text-muted-foreground/50 transition-colors active:bg-zinc-100 dark:border-zinc-800 dark:text-muted-foreground/50 dark:active:bg-zinc-900 sm:h-9"
             >
               {secondaryAction.icon && <span className="[&>svg]:h-[15px] [&>svg]:w-[15px]">{secondaryAction.icon}</span>}
               {secondaryAction.label}
